@@ -1,0 +1,19 @@
+{
+    "credentials":[
+        {
+            "username":"u123@gmail.com",
+            "password":"123",
+            "role":"customer"
+        },
+        {
+            "username":"r123@gmail.com",
+            "password":"123",
+            "role":"restaurant"
+        },
+        {
+            "username":"d123@gmail.com",
+            "password":"123",
+            "role":"delivery"
+        }
+    ]
+}

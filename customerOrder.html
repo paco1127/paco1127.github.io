@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order</title>
+    <link rel="stylesheet" href="Main.css">
+    <script type="text/javascript" src="jslib/jquery-1.11.1.js"></script>
+    <script type="text/javascript">
+        var cartItems = {};
+        var totalPrice = 0;
+
+        // Function to add an item to the cart
+        function addToCart(item, price) {
+            if (cartItems[item]) {
+                cartItems[item].quantity += 1;
+            } else {
+                cartItems[item] = { quantity: 1, price: price };
+            }
+
+            totalPrice += price;
+            updateCartDisplay();
+        }
+
+        $(document).ready(function () {
+
+            if(document.cookie.split("; ").find((row) => row.startsWith("role="))?.split("=")[1] != "customer"){
+                alert("Error, please login and retry!")
+                window.location.href = "Main.html";
+            }
+            $("#cartContainer").hide();
+            $(".food-items button").click(function () {
+                var itemName = $(this).closest(".food-items").find("h5").text();
+                var itemPrice = parseInt($(this).closest(".food-items").find(".price").text().replace('$', ''));
+                addToCart(itemName, itemPrice);
+            });
+            $(".food-items .order").click(function () {
+                var foodItem = $(this).closest(".food-items");
+                var cartPosition = $("#cartImage").offset(); // Get the position of the cart image
+
+                // Animate the food item to the cart position
+                foodItem.animate(
+                    {
+                        top: cartPosition.top,
+                        left: cartPosition.left,
+                        width: '5px', // Adjust the desired width
+                        height: '5px', // Adjust the desired height
+                    },
+                    10000,
+                    function () {
+                        // After animation completes, hide the food item
+                        foodItem.hide();
+
+                        // Show the food item back after a delay
+                        setTimeout(function () {
+                            foodItem.css({ top: '', left: '', width: '', height: '' }); // Reset the position and size
+                            foodItem.show();
+                        }, 0); // Adjust the delay as needed
+                    }
+                );
+            });
+            $("#cartImage").click(function () {
+                $("#cartContainer").toggle();
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+    <div class="menu">
+
+
+        <div class="food-items">
+            <img src="img/1.jpg">
+            <div class="details">
+                <div class="details-sub">
+                    <h5>Apple</h5>
+                    <h5 class="price"> $28 </h5>
+                </div>
+                <p>Lenore dreaming and home and seraphim no being. Into with december press and the cannot bird. Beast
+                    in nevermore this.America At justo vero et at voluptua, vero diam gubergren magna.</p>
+                <button class="order">Order Now</button>
+            </div>
+        </div>
+
+        <div class="food-items">
+            <img src="2.jpeg">
+            <div class="details">
+                <div class="details-sub">
+                    <h5>Orange</h5>
+                    <h5 class="price"> $26 </h5>
+                </div>
+                <p>Me adore perfumed and lenore was to then and soul tossed. Floor i youhere followed the spoke i. That
+                    memories.</p>
+                <button class="order">Order Now</button>
+            </div>
+        </div>
+
+        <div class="food-items">
+            <img src="3.jpg">
+            <div class="details">
+                <div class="details-sub">
+                    <h5>Banana</h5>
+                    <h5 class="price"> $24 </h5>
+                </div>
+                <p>Morrow fearing smiling dreams then echo i the linking raven, stood before form to his into, art he
+                    thing mortals.</p>
+                <button class="order">Order Now</button>
+            </div>
+        </div>
+
+        <div class="food-items">
+            <img src="4.jpg">
+            <div class="details">
+                <div class="details-sub">
+                    <h5>Pear</h5>
+                    <h5 class="price"> $22 </h5>
+                </div>
+                <p>Longer my eyes nothing perfumed flirt of, dared answer silence whose the flirt raven rapping
+                    gileadtell quoth, morrow cushions chamber.</p>
+                <button class="order">Order Now</button>
+            </div>
+        </div>
+
+
+        <div class="food-items">
+            <img src="5.jpeg">
+            <div class="details">
+                <div class="details-sub">
+                    <h5>Burger</h5>
+                    <h5 class="price"> $70 </h5>
+                </div>
+                <p>Doubtless clasp of floor cushioned lining visiter soul for mystery the. Thy then bird unseen before
+                    get remember be plutonian.</p>
+                <button class="order">Order Now</button>
+            </div>
+        </div>
+
+        <div class="food-items">
+            <img src="6.jpeg">
+            <div class="details">
+                <div class="details-sub">
+                    <h5>Noodle</h5>
+                    <h5 class="price"> $90 </h5>
+                </div>
+                <p>Opened i quoth spoken let stayed ghost. Till so madam bore was this get the, countenance and that
+                    ashore your,.</p>
+                <button class="order">Order Now</button>
+            </div>
+        </div>
+
+        <img src="img/cart.png" alt="cart" height="10px" width="10px" class="cartimg" id="cartImage">
+        <div id="cartContainer">
+            <h2>Shopping Cart</h2>
+            <ul id="cartItemsList"></ul>
+        </div>
+
+
+
+
+    </div>
+
+    <script>
+        function updateCartDisplay() {
+            var cartItemsList = document.getElementById("cartItemsList");
+            cartItemsList.innerHTML = "";
+
+            for (var item in cartItems) {
+                var li = document.createElement("li");
+                li.innerHTML = item + " " + cartItems[item].quantity + " $" + (cartItems[item].price * cartItems[item].quantity);
+                cartItemsList.appendChild(li);
+            }
+
+            var totalPriceElement = document.createElement("li");
+            totalPriceElement.innerHTML = "Total: $" + totalPrice;
+            cartItemsList.appendChild(totalPriceElement);
+        }
+
+    </script>
+</body>
+
+</html>
