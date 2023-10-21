@@ -27,7 +27,7 @@
 
             if(document.cookie.split("; ").find((row) => row.startsWith("role="))?.split("=")[1] != "customer"){
                 alert("Error, please login and retry!")
-                window.location.href = "Main.html";
+                window.location.href = "index.html";
             }
             $("#cartContainer").hide();
             $(".food-items button").click(function () {

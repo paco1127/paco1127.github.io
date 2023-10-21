@@ -9,6 +9,7 @@
             var inputs = document.querySelectorAll('.input_form_sign');
             document.querySelectorAll('.ul_tabs > li')[0].className = "";
             document.querySelectorAll('.ul_tabs > li')[1].className = "active";
+            document.querySelector('.btn_sign').className = "btn_sign";
 
             for (var i = 0; i < inputs.length; i++) {
                 if (i == 2) {
@@ -28,7 +29,7 @@
             document.querySelector('.link_forgot_pass').style.opacity = "0";
             document.querySelector('.link_forgot_pass').style.top = "-5px";
             document.querySelector('.btn_sign').innerHTML = "SIGN UP";
-            document.querySelector('.btn_sign').className = "btn_sign";
+
 
             setTimeout(function () {
 
@@ -49,6 +50,7 @@
             var inputs = document.querySelectorAll('.input_form_sign');
             document.querySelectorAll('.ul_tabs > li')[0].className = "active";
             document.querySelectorAll('.ul_tabs > li')[1].className = "";
+            document.querySelector('.btn_sign').className = "btn_sign login";
 
             for (var i = 0; i < inputs.length; i++) {
                 switch (i) {
@@ -110,7 +112,7 @@
                 }
             }, 1500);
             document.querySelector('.btn_sign').innerHTML = "SIGN IN";
-            document.querySelector('.btn_sign').className = "btn_sign login";
+
         }
 
 
@@ -122,35 +124,38 @@
             document.cookie = "username= ;Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
             document.cookie = "role= ;Expires=Thu, 01 Jan 1970 00:00:01 GMT;"
             $(".login").click(function () {
-                var username = $("#ac").val();
-                var password = $("#pw").val();
+                if (this.className === "btn_sign login") {
+                    var username = $("#ac").val();
+                    var password = $("#pw").val();
 
-                // Fetch the JSON file
-                $.getJSON("user.json", function (data) {
-                    var credentials = data.credentials;
-                    // Loop through the credentials and check for a match
-                    for (var i = 0; i < credentials.length; i++) {
-                        var credential = credentials[i];
+                    // Fetch the JSON file
+                    $.getJSON("user.json", function (data) {
+                        var credentials = data.credentials;
+                        // Loop through the credentials and check for a match
+                        for (var i = 0; i < credentials.length; i++) {
+                            var credential = credentials[i];
 
-                        if (credential.username === username && credential.password === password) {
-                            // Match found, perform login logic here
-                            alert("Login successful!");
-                            document.cookie = "username=" + encodeURIComponent(username) + "; max-age=3600; Secure";
-                            document.cookie = "role=" + credential.role + "; max-age=3600; Secure";
-                            if (credential.role === "customer") {
-                                window.location.href = "customerOrder.html";
-                            }
-                            else {
-                                return;
+                            if (credential.username === username && credential.password === password) {
+                                // Match found, perform login logic here
+                                alert("Login successful!");
+                                document.cookie = "username=" + encodeURIComponent(username) + "; max-age=3600; Secure";
+                                document.cookie = "role=" + credential.role + "; max-age=3600; Secure";
+                                if (credential.role === "customer") {
+                                    window.location.href = "customerOrder.html";
+                                }
+                                else {
+                                    return;
+                                }
                             }
                         }
-                    }
 
-                    // No match found
-                    alert("Invalid username or password.");
-                }).fail(function (error) {
-                    console.error(error);
-                });
+                        // No match found
+                        alert("Invalid username or password.");
+                    }).fail(function (error) {
+                        console.error(error);
+                    });
+                }
+
             });
         });
     </script>
@@ -352,37 +357,36 @@
 
         <div class="cont_centrar">
             <div class="cont_login">
-                    <div class="cont_tabs_login">
-                        <ul class='ul_tabs'>
-                            <li class="active"><a href="#" onclick="sign_in()">SIGN IN</a>
-                                <span class="linea_bajo_nom"></span>
-                            </li>
-                            <li><a href="#up" onclick="sign_up()">SIGN UP</a><span class="linea_bajo_nom"></span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="cont_text_inputs">
-                        <input type="text" class="input_form_sign " placeholder="NAME" name="name_us" />
+                <div class="cont_tabs_login">
+                    <ul class='ul_tabs'>
+                        <li class="active"><a href="#" onclick="sign_in()">SIGN IN</a>
+                            <span class="linea_bajo_nom"></span>
+                        </li>
+                        <li><a href="#up" onclick="sign_up()">SIGN UP</a><span class="linea_bajo_nom"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="cont_text_inputs">
+                    <input type="text" class="input_form_sign " placeholder="NAME" name="name_us" />
 
-                        <input type="text" class="input_form_sign d_block active_inp" id="ac" placeholder="EMAIL"
-                            name="emauil_us" />
+                    <input type="text" class="input_form_sign d_block active_inp" id="ac" placeholder="EMAIL"
+                        name="emauil_us" />
 
-                        <input type="password" class="input_form_sign d_block  active_inp" id="pw" placeholder="PASSWORD"
-                            name="pass_us" />
-                        <input type="password" class="input_form_sign" placeholder="CONFIRM PASSWORD"
-                            name="conf_pass_us" />
+                    <input type="password" class="input_form_sign d_block  active_inp" id="pw" placeholder="PASSWORD"
+                        name="pass_us" />
+                    <input type="password" class="input_form_sign" placeholder="CONFIRM PASSWORD" name="conf_pass_us" />
 
-                        <a href="#" class="link_forgot_pass d_block">Forgot Password ?</a>
-                        <div class="terms_and_cons d_none">
-                            <p><input type="checkbox" name="terms_and_cons" /> <label for="terms_and_cons">Accept Terms
-                                    and Conditions.</label></p>
-
-                        </div>
-                    </div>
-                    <div class="cont_btn">
-                        <button class="btn_sign login">SIGN IN</button>
+                    <a href="#" class="link_forgot_pass d_block">Forgot Password ?</a>
+                    <div class="terms_and_cons d_none">
+                        <p><input type="checkbox" name="terms_and_cons" /> <label for="terms_and_cons">Accept Terms
+                                and Conditions.</label></p>
 
                     </div>
+                </div>
+                <div class="cont_btn">
+                    <button class="btn_sign login">SIGN IN</button>
+
+                </div>
             </div>
 
         </div>
