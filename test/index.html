@@ -2,16 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Simple Antimatter Game</title>
+<title>Complex Antimatter Game</title>
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/break_infinity.js"></script>
 </head>
 <body>
+    <div id="controls">
+        <button onclick="speedUpTicks()">Tick Speed Up</button>
+    </div>
     <div class="game-container">
-        <h1>Antimatter Dimensions</h1>
-        <p>Antimatter: <span id="antimatter">0</span></p>
-        <button onclick="produceAntimatter()">Produce Antimatter</button>
-        <button onclick="buyGenerator()">Buy Generator (Cost: <span id="generatorCost">10</span>)</button>
-        <p>Generators: <span id="generators">0</span></p>
+        <h1>Unlimited Number Dimensions</h1>
+        <p>Number: <span id="antimatter">0</span></p>
+        <div id="generators">
+            <button onclick="produceAntimatter()">Produce Number</button>
+            <!-- Generator buttons will be added here dynamically -->
+        </div>
     </div>
 
 <script src="script.js"></script>
