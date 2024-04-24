@@ -1,38 +1,19 @@
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script>
-        document.querySelector('form').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const file = document.querySelector('input[type="file"]').files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.text())
-                .then(result => {
-                    // Handle the result returned by the server
-                    console.log(result);
-                })
-                .catch(error => {
-                    // Handle any errors
-                    console.error(error);
-                });
-        });
-    </script>
+<meta charset="UTF-8">
+<title>Simple Antimatter Game</title>
+<link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-    Uploading file by executing a Python script
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-      </form>
-    </form>
-</body>
+    <div class="game-container">
+        <h1>Antimatter Dimensions</h1>
+        <p>Antimatter: <span id="antimatter">0</span></p>
+        <button onclick="produceAntimatter()">Produce Antimatter</button>
+        <button onclick="buyGenerator()">Buy Generator (Cost: <span id="generatorCost">10</span>)</button>
+        <p>Generators: <span id="generators">0</span></p>
+    </div>
 
+<script src="script.js"></script>
+</body>
 </html>
