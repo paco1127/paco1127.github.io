@@ -3,6 +3,9 @@
 <head>
   <title>CSV Reader</title>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2"></script>
+  
   <script>
     var csvData;
     var currentIndex = 0;
@@ -21,10 +24,11 @@
 
     function displayData() {
       var row = csvData[currentIndex];
-      var name = row[1];
-      var count = row[2];
-      var zeros = Array(row[3] + 1).join("0");
-      var output = name + " = " + count + ", where there are \"count 0\" of " + zeros + "s";
+      var name = "1 " + row[1];
+      var count = parseFloat(row[2].replace(/,/g, ""));
+      var zeros = Array(count + 1).join("0");
+      var formattedCount = zeros.toLocaleString(); // Format count with commas
+      var output = name + " = 1" + formattedCount
 
       $("#output").text(output);
     }
