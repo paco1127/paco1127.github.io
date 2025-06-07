@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style>
+body { font-family: monospace; }
+
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  @page {
+    size: A4;
+    margin: 0 /* top/bottom: 2cm, left/right: 1.7cm */
+  }
+}
+
+/* Screen styles */
+.grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, 1.2625cm) /* Adjusted for 11.5cm total width with 1.4cm middle column */
+    1.4cm              /* Middle column width preserved */
+    repeat(4, 1.2625cm); /* Adjusted for 11.5cm total width with 1.4cm middle column */
+  grid-template-rows: repeat(20, 1.275cm); /* Adjusted for 25.5cm total height */
+  width: 11.5cm; /* Total width */
+  height: 25.5cm; /* Total height */
+  border: 1px solid #aaa;
+  margin: 2em auto;
+}
+.cell {
+  border: 1px solid #eee;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 8pt;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.station { color: #001100; text-shadow: #ffffff; }
+
+/* MTR Line colors (Updated) */
+.EAL { background-color: #5eb7e8; }
+.KTL { background-color: #00a040; }
+.TWL { background-color: #e60012; }
+.ISL { background-color: #0075c2; }
+.TCL { background-color: #f3982d; }
+.TKL { background-color: #7e3c93; }
+.TML { background-color: #9c2e00; }
+.DRL { background-color: #eb6ea5; }
+.SIL { background-color: #cbd300; }
+.AEL { background-color: #00888e; }
+
+/* Light Rail Line Colors (Updated) */
+.LR505 { background-color: #d92329; }
+.LR507 { background-color: #00a551; }
+.LR610 { background-color: #541b15; color: #ffffff;}
+.LR614 { background-color: #00c0f3; }
+.LR614P { background-color: #f2858e; }
+.LR615 { background-color: #ffdd00; }
+.LR615P { background-color: #006585; }
+.LR705 { background-color: #6ebf45; }
+.LR706 { background-color: #b17ab5; }
+.LR751 { background-color: #f48221; }
+.LR761P { background-color: #6e2c91; }
+.hidden { display: none; }
+</style>
+<script>
+function shuffleGrid(lightRailStations) {
+  const grid = document.querySelector('.grid');
+  
+  // Mark all light rail stations as hidden initially
+  const allLightRail = Array.from(document.querySelectorAll('.LR505, .LR507, .LR610, .LR614, .LR614P, .LR615, .LR615P, .LR705, .LR706, .LR751, .LR761P'));
+  allLightRail.forEach(station => station.classList.add('hidden'));
+
+  // Unhide the selected light rail stations
+  lightRailStations.forEach(station => station.classList.remove('hidden'));
+
+  // Get all MTR stations and visible light rail stations
+  const mtrStations = Array.from(document.querySelectorAll('.EAL, .KTL, .TWL, .ISL, .TCL, .TKL, .TML, .DRL, .SIL, .AEL'));
+  const visibleLightRail = Array.from(document.querySelectorAll('.LR505:not(.hidden), .LR507:not(.hidden), .LR610:not(.hidden), .LR614:not(.hidden), .LR614P:not(.hidden), .LR615:not(.hidden), .LR615P:not(.hidden), .LR705:not(.hidden), .LR706:not(.hidden), .LR751:not(.hidden), .LR761P:not(.hidden)'));
+  
+  // Combine all stations and shuffle them
+  const allStations = [...mtrStations, ...visibleLightRail];
+  shuffleArray(allStations);
+  
+  // Create a new grid layout
+  grid.innerHTML = '';
+  
+  // We have 9 columns (with the middle one empty) and 20 rows
+  let stationIndex = 0;
+  for (let row = 0; row < 20; row++) {
+    for (let col = 0; col < 9; col++) {
+      if (col === 4) {
+        // Middle column - always empty
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('cell');
+        grid.appendChild(emptyCell);
+      } else if (stationIndex < allStations.length) {
+        // Add a station
+        const station = allStations[stationIndex++];
+        station.classList.add('cell');
+        grid.appendChild(station);
+      } else {
+        // If we've run out of stations, add an empty cell
+        const emptyCell = document.createElement('div');
+        emptyCell.classList.add('cell');
+        grid.appendChild(emptyCell);
+      }
+    }
+  }
+}
+
+// Fisher-Yates shuffle algorithm
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+window.onload = function() {
+  // Get all MTR and light rail stations
+  const allMTRStations = Array.from(document.querySelectorAll('.EAL, .KTL, .TWL, .ISL, .TCL, .TKL, .TML, .DRL, .SIL, .AEL')); 
+  const allLightRail = Array.from(document.querySelectorAll('.LR505, .LR507, .LR610, .LR614, .LR614P, .LR615, .LR615P, .LR705, .LR706, .LR751, .LR761P'));
+
+  // Calculate available cells (total cells - middle column cells)
+  const totalCells = 9 * 20; // 180 total cells
+  const middleColumnCells = 20; // 20 empty middle column cells
+  const availableCells = totalCells - middleColumnCells; // 160 available cells
+
+  // Calculate how many light rail stations to select
+  const numLightRailToSelect = availableCells - allMTRStations.length;
+
+  // Randomly select light rail stations
+  const selectedLightRail = [];
+  const lightRailCopy = [...allLightRail]; // Make a copy to avoid modifying original
+  
+  for (let i = 0; i < numLightRailToSelect && lightRailCopy.length > 0; i++) {
+    const randomIndex = Math.floor(Math.random() * lightRailCopy.length);
+    selectedLightRail.push(lightRailCopy.splice(randomIndex, 1)[0]);
+  }
+
+  shuffleGrid(selectedLightRail);
+};
+</script>
+</head>
+<body>
+
+<div class="grid">
+  <!-- MTR Stations (All MUST be present) -->
+  <div class="cell EAL station">落馬洲</div>
+  <div class="cell EAL station">羅湖</div>
+  <div class="cell EAL station">上水</div>
+  <div class="cell EAL station">粉嶺</div>
+  <div class="cell EAL station">太和</div>
+  <div class="cell EAL station">大埔墟</div>
+  <div class="cell EAL station">大學</div>
+  <div class="cell EAL station">火炭</div>
+  <div class="cell EAL station">沙田</div>
+  <div class="cell EAL station">大圍</div>
+  <div class="cell EAL station">九龍塘</div>
+  <div class="cell EAL station">旺角東</div>
+  <div class="cell EAL station">紅磡</div>
+  <div class="cell EAL station">會展</div>
+  <div class="cell EAL station">金鐘</div>
+  <div class="cell AEL station">博覽館</div>
+  <div class="cell AEL station">機場</div>
+  <div class="cell TCL station">東涌</div>
+  <div class="cell TCL station">欣澳</div>
+  <div class="cell DRL station">迪士尼</div>
+  <div class="cell TML station">屯門</div>
+  <div class="cell TML station">兆康</div>
+  <div class="cell TML station">天水圍</div>
+  <div class="cell TML station">朗屏</div>
+  <div class="cell TML station">元朗</div>
+  <div class="cell TML station">錦上路</div>
+  <div class="cell TML station">荃灣西</div>
+  <div class="cell TML station">美孚</div>
+  <div class="cell TML station">南昌</div>
+  <div class="cell TML station">柯士甸</div>
+  <div class="cell TML station">尖東</div>
+  <div class="cell TML station">紅磡</div>
+  <div class="cell TML station">何文田</div>
+  <div class="cell TML station">土瓜灣</div>
+  <div class="cell TML station">宋皇臺</div>
+  <div class="cell TML station">啟德</div>
+  <div class="cell TML station">鑽石山</div>
+  <div class="cell TML station">顯徑</div>
+  <div class="cell TML station">大圍</div>
+  <div class="cell TML station">車公廟</div>
+  <div class="cell TML station">沙田圍</div>
+  <div class="cell TML station">第一城</div>
+  <div class="cell TML station">石門</div>
+  <div class="cell TML station">大水坑</div>
+  <div class="cell TML station">恆安</div>
+  <div class="cell TML station">馬鞍山</div>
+  <div class="cell TML station">烏溪沙</div>
+  <div class="cell TWL station">荃灣</div>
+  <div class="cell TWL station">大窩口</div>
+  <div class="cell TWL station">葵興</div>
+  <div class="cell TWL station">葵芳</div>
+  <div class="cell TWL station">荔景</div>
+  <div class="cell TWL station">美孚</div>
+  <div class="cell TWL station">荔枝角</div>
+  <div class="cell TWL station">長沙灣</div>
+  <div class="cell TWL station">深水埗</div>
+  <div class="cell TWL station">太子</div>
+  <div class="cell TWL station">旺角</div>
+  <div class="cell TWL station">油麻地</div>
+  <div class="cell TWL station">佐敦</div>
+  <div class="cell TWL station">尖沙咀</div>
+  <div class="cell TWL station">金鐘</div>
+  <div class="cell TWL station">中環</div>
+   <div class="cell TCL station">香港</div>
+  <div class="cell TCL station">九龍</div>
+  <div class="cell TCL station">奧運</div>
+  <div class="cell TCL station">南昌</div>
+  <div class="cell ISL station">堅尼地城</div>
+  <div class="cell ISL station">香港大學</div>
+  <div class="cell ISL station">西營盤</div>
+  <div class="cell ISL station">上環</div>
+  <div class="cell ISL station">中環</div>
+  <div class="cell ISL station">金鐘</div>
+  <div class="cell ISL station">灣仔</div>
+  <div class="cell ISL station">銅鑼灣</div>
+  <div class="cell ISL station">天后</div>
+  <div class="cell ISL station">炮台山</div>
+  <div class="cell ISL station">北角</div>
+  <div class="cell ISL station">鰂魚涌</div>
+  <div class="cell ISL station">太古</div>
+  <div class="cell ISL station">西灣河</div>
+  <div class="cell ISL station">筲箕灣</div>
+  <div class="cell ISL station">杏花邨</div>
+  <div class="cell ISL station">柴灣</div>
+  <div class="cell KTL station">調景嶺</div>
+  <div class="cell KTL station">油塘</div>
+  <div class="cell KTL station">藍田</div>
+  <div class="cell KTL station">觀塘</div>
+  <div class="cell KTL station">牛頭角</div>
+  <div class="cell KTL station">九龍灣</div>
+  <div class="cell KTL station">彩虹</div>
+  <div class="cell KTL station">鑽石山</div>
+  <div class="cell KTL station">黃大仙</div>
+  <div class="cell KTL station">樂富</div>
+  <div class="cell KTL station">九龍塘</div>
+  <div class="cell KTL station">石硤尾</div>
+  <div class="cell KTL station">太子</div>
+  <div class="cell KTL station">旺角</div>
+  <div class="cell KTL station">油麻地</div>
+  <div class="cell KTL station">何文田</div>
+  <div class="cell KTL station">黃埔</div>
+  <div class="cell TKL station">北角</div>
+  <div class="cell TKL station">鰂魚涌</div>
+  <div class="cell TKL station">油塘</div>
+  <div class="cell TKL station">調景嶺</div>
+  <div class="cell TKL station">將軍澳</div>
+  <div class="cell TKL station">坑口</div>
+  <div class="cell TKL station">寶琳</div>
+   <div class="cell TKL station">康城</div>
+  <div class="cell SIL station">金鐘</div>
+  <div class="cell SIL station">海洋公園</div>
+  <div class="cell SIL station">黃竹坑</div>
+  <div class="cell SIL station">利東</div>
+  <div class="cell SIL station">海怡半島</div>
+
+  <!-- Light Rail Stations (All Initially Hidden) -->
+  <div class="cell LR505 station">三聖</div>
+  <div class="cell LR505 station">兆麟</div>
+    <div class="cell LR505 station">安定</div>
+  <div class="cell LR505 station">市中心</div>
+  <div class="cell LR505 station">屯門</div>
+  <div class="cell LR505 station">建安</div>
+  <div class="cell LR505 station">山景(南)</div>
+  <div class="cell LR505 station">山景(北)</div>
+  <div class="cell LR505 station">石排</div>
+  <div class="cell LR505 station">新圍</div>
+  <div class="cell LR505 station">良景</div>
+  <div class="cell LR505 station">田景</div>
+  <div class="cell LR505 station">建生</div>
+  <div class="cell LR505 station">青松</div>
+  <div class="cell LR505 station">麒麟</div>
+  <div class="cell LR505 station">兆康</div>
+
+    <div class="cell LR507 station">屯門碼頭</div>
+  <div class="cell LR507 station">兆禧</div>
+    <div class="cell LR507 station">屯門泳池</div>
+  <div class="cell LR507 station">豐景園</div>
+  <div class="cell LR507 station">兆麟</div>
+  <div class="cell LR507 station">安定</div>
+  <div class="cell LR507 station">市中心</div>
+  <div class="cell LR507 station">屯門</div>
+  <div class="cell LR507 station">河田</div>
+  <div class="cell LR507 station">蔡意橋</div>
+  <div class="cell LR507 station">銀圍</div>
+  <div class="cell LR507 station">大興(南)</div>
+  <div class="cell LR507 station">大興(北)</div>
+  <div class="cell LR507 station">新圍</div>
+  <div class="cell LR507 station">良景</div>
+  <div class="cell LR507 station">田景</div>
+
+      <div class="cell LR614P station">屯門碼頭</div>
+  <div class="cell LR614P station">兆禧</div>
+    <div class="cell LR614P station">屯門泳池</div>
+  <div class="cell LR614P station">豐景園</div>
+  <div class="cell LR614P station">兆麟</div>
+  <div class="cell LR614P station">安定</div>
+  <div class="cell LR614P station">市中心</div>
+  <div class="cell LR614P station">杯渡</div>
+  <div class="cell LR614P station">何福堂</div>
+  <div class="cell LR614P station">新墟</div>
+  <div class="cell LR614P station">景峰</div>
+  <div class="cell LR614P station">鳳地</div>
+  <div class="cell LR614P station">兆康</div>
+
+        <div class="cell LR615P station">兆康</div>
+  <div class="cell LR615P station">麒麟</div>
+    <div class="cell LR615P station">青松</div>
+  <div class="cell LR615P station">建生</div>
+  <div class="cell LR615P station">田景</div>
+  <div class="cell LR615P station">良景</div>
+  <div class="cell LR615P station">新圍</div>
+  <div class="cell LR615P station">石排</div>
+  <div class="cell LR615P station">鳴琴</div>
+  <div class="cell LR615P station">青雲</div>
+  <div class="cell LR615P station">青山村</div>
+  <div class="cell LR615P station">龍門</div>
+  <div class="cell LR615P station">輕鐵車廠</div>
+  <div class="cell LR615P station">蝴蝶</div>
+  <div class="cell LR615P station">美樂</div>
+  <div class="cell LR615P station">屯門碼頭</div>
+
+          <div class="cell LR610 station">屯門碼頭</div>
+  <div class="cell LR610 station">美樂</div>
+    <div class="cell LR610 station">蝴蝶</div>
+  <div class="cell LR610 station">輕鐵車廠</div>
+  <div class="cell LR610 station">龍門</div>
+  <div class="cell LR610 station">青山村</div>
+  <div class="cell LR610 station">青雲</div>
+  <div class="cell LR610 station">鳴琴</div>
+  <div class="cell LR610 station">石排</div>
+  <div class="cell LR610 station">大興(北)</div>
+  <div class="cell LR610 station">大興(南)</div>
+  <div class="cell LR610 station">銀圍</div>
+  <div class="cell LR610 station">澤豐</div>
+  <div class="cell LR610 station">屯門醫院</div>
+  <div class="cell LR610 station">兆康</div>
+  <div class="cell LR610 station">藍地</div>
+  <div class="cell LR610 station">泥圍</div>
+  <div class="cell LR610 station">鍾屋村</div>
+  <div class="cell LR610 station">洪水橋</div>
+  <div class="cell LR610 station">塘坊村</div>
+  <div class="cell LR610 station">屏山</div>
+  <div class="cell LR610 station">水邊圍</div>
+  <div class="cell LR610 station">豐年路</div>
+  <div class="cell LR610 station">康樂路</div>
+  <div class="cell LR610 station">大棠路</div>
+  <div class="cell LR610 station">元朗</div>
+
+            <div class="cell LR614 station">屯門碼頭</div>
+  <div class="cell LR614 station">兆禧</div>
+    <div class="cell LR614 station">屯門泳池</div>
+  <div class="cell LR614 station">豐景園</div>
+  <div class="cell LR614 station">兆麟</div>
+  <div class="cell LR614 station">安定</div>
+  <div class="cell LR614 station">市中心</div>
+  <div class="cell LR614 station">杯渡</div>
+  <div class="cell LR614 station">何福堂</div>
+  <div class="cell LR614 station">新墟</div>
+  <div class="cell LR614 station">景峰</div>
+  <div class="cell LR614 station">鳳地</div>
+  <div class="cell LR614 station">兆康</div>
+  <div class="cell LR614 station">藍地</div>
+  <div class="cell LR614 station">泥圍</div>
+  <div class="cell LR614 station">鍾屋村</div>
+  <div class="cell LR614 station">洪水橋</div>
+  <div class="cell LR614 station">塘坊村</div>
+  <div class="cell LR614 station">屏山</div>
+  <div class="cell LR614 station">水邊圍</div>
+  <div class="cell LR614 station">豐年路</div>
+  <div class="cell LR614 station">康樂路</div>
+  <div class="cell LR614 station">大棠路</div>
+  <div class="cell LR614 station">元朗</div>
+
+              <div class="cell LR615 station">屯門碼頭</div>
+  <div class="cell LR615 station">美樂</div>
+    <div class="cell LR615 station">蝴蝶</div>
+  <div class="cell LR615 station">輕鐵車廠</div>
+  <div class="cell LR615 station">龍門</div>
+  <div class="cell LR615 station">青山村</div>
+  <div class="cell LR615 station">青雲</div>
+  <div class="cell LR615 station">鳴琴</div>
+  <div class="cell LR615 station">石排</div>
+  <div class="cell LR615 station">新圍</div>
+  <div class="cell LR615 station">良景</div>
+  <div class="cell LR615 station">田景</div>
+  <div class="cell LR615 station">建生</div>
+  <div class="cell LR615 station">青松</div>
+  <div class="cell LR615 station">兆康</div>
+  <div class="cell LR615 station">藍地</div>
+  <div class="cell LR615 station">泥圍</div>
+  <div class="cell LR615 station">鍾屋村</div>
+  <div class="cell LR615 station">洪水橋</div>
+  <div class="cell LR615 station">塘坊村</div>
+  <div class="cell LR615 station">屏山</div>
+  <div class="cell LR615 station">水邊圍</div>
+  <div class="cell LR615 station">豐年路</div>
+  <div class="cell LR615 station">康樂路</div>
+  <div class="cell LR615 station">大棠路</div>
+  <div class="cell LR615 station">元朗</div>
+
+                <div class="cell LR705 station">天水圍</div>
+  <div class="cell LR705 station">天慈</div>
+    <div class="cell LR705 station">天湖</div>
+  <div class="cell LR705 station">銀座</div>
+  <div class="cell LR705 station">天榮</div>
+      <div class="cell LR705 station">天悅</div>
+  <div class="cell LR705 station">天秀</div>
+    <div class="cell LR705 station">濕地公園</div>
+  <div class="cell LR705 station">天恒</div>
+  <div class="cell LR705 station">天逸</div>
+  <div class="cell LR705 station">天富</div>
+  <div class="cell LR705 station">頌富</div>
+  <div class="cell LR705 station">天瑞</div>
+  <div class="cell LR705 station">樂湖</div>
+  <div class="cell LR705 station">天耀</div>
+
+                  <div class="cell LR706 station">天水圍</div>
+  <div class="cell LR706 station">天耀</div>
+    <div class="cell LR706 station">樂湖</div>
+  <div class="cell LR706 station">天瑞</div>
+  <div class="cell LR706 station">頌富</div>
+      <div class="cell LR706 station">天富</div>
+  <div class="cell LR706 station">天逸</div>
+    <div class="cell LR706 station">天恒</div>
+  <div class="cell LR706 station">濕地公園</div>
+  <div class="cell LR706 station">天秀</div>
+  <div class="cell LR706 station">天悅</div>
+  <div class="cell LR706 station">天榮</div>
+    <div class="cell LR706 station">銀座</div>
+  <div class="cell LR706 station">天湖</div>
+  <div class="cell LR706 station">天慈</div>
+
+                    <div class="cell LR751 station">友愛</div>
+  <div class="cell LR751 station">安定</div>
+    <div class="cell LR751 station">市中心</div>
+  <div class="cell LR751 station">屯門</div>
+  <div class="cell LR751 station">河田</div>
+      <div class="cell LR751 station">蔡意橋</div>
+  <div class="cell LR751 station">澤豐</div>
+    <div class="cell LR751 station">屯門醫院</div>
+  <div class="cell LR751 station">兆康</div>
+  <div class="cell LR751 station">藍地</div>
+  <div class="cell LR751 station">泥圍</div>
+  <div class="cell LR751 station">鍾屋村</div>
+  <div class="cell LR751 station">洪水橋</div>
+  <div class="cell LR751 station">坑尾村</div>
+  <div class="cell LR751 station">天水圍</div>
+  <div class="cell LR751 station">天慈</div>
+    <div class="cell LR751 station">天湖</div>
+  <div class="cell LR751 station">銀座</div>
+  <div class="cell LR751 station">天榮</div>
+      <div class="cell LR751 station">翠湖</div>
+  <div class="cell LR751 station">頌富</div>
+    <div class="cell LR751 station">天富</div>
+  <div class="cell LR751 station">天逸</div>
+
+                      <div class="cell LR761P station">天逸</div>
+  <div class="cell LR761P station">天富</div>
+    <div class="cell LR761P station">頌富</div>
+  <div class="cell LR761P station">天瑞</div>
+  <div class="cell LR761P station">樂湖</div>
+      <div class="cell LR761P station">天耀</div>
+  <div class="cell LR761P station">坑尾村</div>
+    <div class="cell LR761P station">塘坊村</div>
+  <div class="cell LR761P station">屏山</div>
+  <div class="cell LR761P station">水邊圍</div>
+  <div class="cell LR761P station">豐年路</div>
+  <div class="cell LR761P station">康樂路</div>
+  <div class="cell LR761P station">大棠路</div>
+  <div class="cell LR761P station">元朗</div>
+</div>
+
+</body>
+</html>
