@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2 Truths 1 Lie</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f0f2f5; 
+            color: #1c1e21;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container { 
+            background-color: #ffffff; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1, h2 { 
+            color: #1877f2; 
+            text-align: center;
+        }
+        h1 { margin-bottom: 20px; }
+        h2 { margin-bottom: 15px; font-size: 1.2em; }
+        label { 
+            display: block; 
+            margin-top: 12px; 
+            font-weight: 600;
+            color: #606770;
+        }
+        input[type="text"] { 
+            width: calc(100% - 22px); 
+            padding: 10px; 
+            margin-top: 6px; 
+            border: 1px solid #dddfe2; 
+            border-radius: 6px; 
+            font-size: 1em;
+        }
+        input[type="text"]:focus {
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px #e7f3ff;
+            outline: none;
+        }
+        button { 
+            background-color: #1877f2; 
+            color: white; 
+            padding: 10px 18px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin-top: 20px;
+            font-size: 1em;
+            font-weight: 600;
+            width: 100%;
+        }
+        button:hover { 
+            background-color: #166fe5; 
+        }
+        .statements-display, .guessing-area, .reveal-area { 
+            margin-top: 25px; 
+            padding-top: 20px; 
+            border-top: 1px solid #dddfe2;
+        }
+        .statement-item { 
+            background-color: #f0f2f5; 
+            padding: 12px; 
+            margin-bottom: 10px; 
+            border-radius: 6px; 
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .statement-item:hover { 
+            background-color: #e4e6eb; 
+        }
+        .selected-guess { 
+            background-color: #1877f2 !important; 
+            color: white !important;
+            border-color: #166fe5 !important;
+        }
+        .hidden { 
+            display: none; 
+        }
+        #result { 
+            margin-top: 15px; 
+            font-weight: bold; 
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        #play-again-btn {
+            background-color: #42b72a; /* Green color for play again */
+            margin-top: 10px;
+        }
+        #play-again-btn:hover {
+            background-color: #36a420;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>2 Truths 1 Lie</h1>
+
+        <div id="input-section">
+            <h2>Enter Your Statements</h2>
+            <div>
+                <label for="truth1">Truth 1:</label>
+                <input type="text" id="truth1" name="truth1" required>
+            </div>
+            <div>
+                <label for="truth2">Truth 2:</label>
+                <input type="text" id="truth2" name="truth2" required>
+            </div>
+            <div>
+                <label for="lie">The Lie:</label>
+                <input type="text" id="lie" name="lie" required>
+            </div>
+            <button id="submit-statements">Submit Statements</button>
+        </div>
+
+        <div id="game-section" class="hidden">
+            <div class="statements-display">
+                <h2>Guess the Lie!</h2>
+                <p style="text-align:center; color: #606770;">Click on the statement you think is the lie.</p>
+                <div id="statements-list">
+                    <!-- Statements will be populated here by JS -->
+                </div>
+            </div>
+
+            <div class="guessing-area">
+                <button id="reveal-lie-button" class="hidden">Reveal the Lie</button>
+                <p id="result"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const truth1Input = document.getElementById('truth1');
+        const truth2Input = document.getElementById('truth2');
+        const lieInput = document.getElementById('lie');
+        const submitStatementsButton = document.getElementById('submit-statements');
+        
+        const inputSection = document.getElementById('input-section');
+        const gameSection = document.getElementById('game-section');
+        const statementsListDiv = document.getElementById('statements-list');
+        const revealLieButton = document.getElementById('reveal-lie-button');
+        const resultP = document.getElementById('result');
+
+        let statementsData = []; // Renamed from 'statements' to avoid conflict
+        let actualLieValue = ''; // Renamed from 'lieValue'
+        let actualLieIndex = -1;
+
+        submitStatementsButton.addEventListener('click', () => {
+            const t1 = truth1Input.value.trim();
+            const t2 = truth2Input.value.trim();
+            const l = lieInput.value.trim();
+
+            if (!t1 || !t2 || !l) {
+                alert('Please fill in all three statements.');
+                return;
+            }
+
+            actualLieValue = l;
+            statementsData = [
+                { text: t1, isLie: false },
+                { text: t2, isLie: false },
+                { text: l, isLie: true }
+            ];
+
+            // Shuffle statementsData
+            statementsData.sort(() => Math.random() - 0.5);
+            actualLieIndex = statementsData.findIndex(stmt => stmt.isLie);
+
+            displayStatementsForGuessing();
+            inputSection.classList.add('hidden');
+            gameSection.classList.remove('hidden');
+            revealLieButton.classList.remove('hidden');
+            resultP.textContent = '';
+            resultP.style.backgroundColor = 'transparent';
+            
+            // Remove old play again button if it exists
+            const oldPlayAgainButton = document.getElementById('play-again-btn');
+            if (oldPlayAgainButton) {
+                oldPlayAgainButton.remove();
+            }
+        });
+
+        function displayStatementsForGuessing() {
+            statementsListDiv.innerHTML = ''; 
+            statementsData.forEach((stmt, index) => {
+                const stmtDiv = document.createElement('div');
+                stmtDiv.classList.add('statement-item');
+                stmtDiv.textContent = stmt.text; // Display only text, no numbering initially
+                stmtDiv.dataset.index = index;
+                stmtDiv.addEventListener('click', handleGuessSelection);
+                statementsListDiv.appendChild(stmtDiv);
+            });
+        }
+
+        function handleGuessSelection(event) {
+            // Clear previous selection
+            document.querySelectorAll('.statement-item').forEach(item => item.classList.remove('selected-guess'));
+            // Highlight current selection
+            event.target.classList.add('selected-guess');
+            resultP.textContent = `You've selected a statement. Click "Reveal the Lie" to see the answer.`;
+            resultP.style.backgroundColor = '#e7f3ff';
+            resultP.style.color = '#1877f2';
+        }
+
+        revealLieButton.addEventListener('click', () => {
+            if (actualLieIndex === -1) {
+                resultP.textContent = 'Game not started or no statements submitted.';
+                resultP.style.backgroundColor = '#ffebe8';
+                resultP.style.color = '#c92a2a';
+                return;
+            }
+
+            const statementItems = statementsListDiv.querySelectorAll('.statement-item');
+            let guessedIndex = -1;
+            statementItems.forEach(item => {
+                if (item.classList.contains('selected-guess')) {
+                    guessedIndex = parseInt(item.dataset.index);
+                }
+            });
+
+            statementItems.forEach((item, index) => {
+                item.textContent = `${index + 1}. ${statementsData[index].text}`; // Add numbering now
+                if (index === actualLieIndex) {
+                    item.style.backgroundColor = '#fdecea'; 
+                    item.style.color = '#c92a2a';
+                    item.style.borderColor = '#c92a2a';
+                    item.textContent += ' (The Lie)';
+                } else {
+                    item.style.backgroundColor = '#e6f7ff'; 
+                    item.style.color = '#1890ff';
+                    item.style.borderColor = '#1890ff';
+                }
+                item.removeEventListener('click', handleGuessSelection);
+                item.style.cursor = 'default';
+                item.classList.remove('selected-guess'); // Clear selection highlight
+            });
+
+            if (guessedIndex === -1) { // No guess was made
+                 resultP.textContent = `The lie was: "${actualLieValue}" (Statement ${actualLieIndex + 1}).`;
+                 resultP.style.backgroundColor = '#fff3cd';
+                 resultP.style.color = '#856404';
+            } else {
+                if (guessedIndex === actualLieIndex) {
+                    resultP.textContent = `Correct! Statement ${actualLieIndex + 1} ("${actualLieValue}") was the lie.`;
+                    resultP.style.backgroundColor = '#d4edda';
+                    resultP.style.color = '#155724';
+                } else {
+                    resultP.textContent = `Incorrect. Statement ${actualLieIndex + 1} ("${actualLieValue}") was the lie. You picked statement ${guessedIndex + 1}.`;
+                    resultP.style.backgroundColor = '#f8d7da';
+                    resultP.style.color = '#721c24';
+                }
+            }
+            revealLieButton.classList.add('hidden');
+            
+            const playAgainButton = document.createElement('button');
+            playAgainButton.textContent = 'Play Again';
+            playAgainButton.id = 'play-again-btn';
+            playAgainButton.addEventListener('click', resetGame);
+            resultP.parentNode.appendChild(playAgainButton);
+        });
+
+        function resetGame() {
+            inputSection.classList.remove('hidden');
+            gameSection.classList.add('hidden');
+            revealLieButton.classList.add('hidden'); // Ensure reveal button is hidden on reset
+            
+            truth1Input.value = '';
+            truth2Input.value = '';
+            lieInput.value = '';
+            statementsListDiv.innerHTML = '';
+            resultP.textContent = '';
+            resultP.style.backgroundColor = 'transparent';
+            
+            actualLieIndex = -1;
+            statementsData = [];
+            actualLieValue = '';
+
+            const playAgainBtn = document.getElementById('play-again-btn');
+            if (playAgainBtn) {
+                playAgainBtn.remove();
+            }
+        }
+    </script>
+</body>
+</html>
