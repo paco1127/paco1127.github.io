@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>🎰 洞洞板旋轉 🎰</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+    
+    body {
+      font-family: 'Orbitron', monospace;
+      background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      text-align: center;
+      padding: 20px;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="%23ffd700" opacity="0.1"/></svg>') repeat;
+      animation: stars 20s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes stars {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-100px); }
+    }
+
+    .casino-title {
+      color: #ffd700;
+      font-size: 4em;
+      font-weight: 900;
+      text-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffd700;
+      margin-bottom: 30px;
+      animation: neonPulse 2s ease-in-out infinite;
+      letter-spacing: 3px;
+    }
+
+    @keyframes neonPulse {
+      0%, 100% { 
+        text-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffd700;
+        transform: scale(1);
+      }
+      50% { 
+        text-shadow: 0 0 30px #ffd700, 0 0 60px #ffd700, 0 0 90px #ffd700;
+        transform: scale(1.05);
+      }
+    }
+
+    .slot-machine-container {
+      perspective: 3000px;
+      display: inline-block;
+    }
+
+    .slot-machine {
+      background: linear-gradient(145deg, #2c3e50, #34495e);
+      border: 8px solid #ffd700;
+      border-radius: 30px;
+      box-shadow: 
+        0 0 80px rgba(255, 215, 0, 0.4),
+        inset 0 0 50px rgba(0, 0, 0, 0.6),
+        0 30px 60px rgba(0, 0, 0, 0.4);
+      padding: 50px;
+      position: relative;
+      transform-style: preserve-3d;
+      min-width: 600px;
+    }
+
+    .slot-machine::before {
+      content: '';
+      position: absolute;
+      top: -15px;
+      left: -15px;
+      right: -15px;
+      bottom: -15px;
+      background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700, #ffed4e);
+      border-radius: 35px;
+      z-index: -1;
+      animation: borderGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { 
+        opacity: 0.7; 
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+      }
+      50% { 
+        opacity: 1; 
+        box-shadow: 0 0 60px rgba(255, 215, 0, 0.8);
+      }
+    }
+
+    .slots-display {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 50px;
+      background: linear-gradient(145deg, #000, #1a1a1a);
+      padding: 40px;
+      border-radius: 20px;
+      border: 5px solid #333;
+      box-shadow: 
+        inset 0 0 30px rgba(0, 0, 0, 0.9),
+        0 0 20px rgba(255, 215, 0, 0.2);
+    }
+
+    .slot-reel {
+      width: 150px;
+      height: 180px;
+      background: linear-gradient(180deg, #0a0a0a 0%, #1f1f1f 50%, #0a0a0a 100%);
+      border: 4px solid #444;
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        inset 0 0 30px rgba(0, 0, 0, 0.9),
+        0 8px 25px rgba(0, 0, 0, 0.6),
+        inset 0 2px 5px rgba(255, 215, 0, 0.1);
+    }
+
+    .slot-reel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(180deg, rgba(255, 215, 0, 0.3), transparent);
+      z-index: 10;
+    }
+
+    .slot-reel::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(0deg, rgba(255, 215, 0, 0.3), transparent);
+      z-index: 10;
+    }
+
+    .reel-strip {
+      position: absolute;
+      width: 100%;
+      transition: transform 0.5s ease-out;
+    }
+
+    .reel-symbol {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      font-weight: 900;
+      color: #fff;
+      text-shadow:
+        0 0 15px #ffd700,
+        0 0 30px #ffd700,
+        0 0 45px #ffd700;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+      background: transparent;
+    }
+
+    .slot-window {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 130px;
+      height: 160px;
+      border: 3px solid #ffd700;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      box-shadow: 
+        inset 0 0 20px rgba(255, 215, 0, 0.3),
+        0 0 15px rgba(255, 215, 0, 0.2);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .slot-rolling .reel-strip {
+      animation: reelSpin 0.05s linear infinite;
+    }
+
+    @keyframes reelSpin {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-180px); }
+    }
+
+    .lever {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 200px;
+      background: linear-gradient(90deg, #c0392b 0%, #e74c3c 100%);
+      border-radius: 30px 30px 0 0;
+      box-shadow:
+        0 10px 20px rgba(0,0,0,0.4),
+        0 0 0 4px #ffd700 inset;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(.4,2,.6,1), box-shadow 0.3s;
+      font-size: 1.1em;
+      padding: 0 8px;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: ellipsis;
+      text-align: center;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 2;
+    }
+
+    #leverText {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      text-align: center;
+      line-height: 1.2;
+      font-size: 1.1em;
+      margin: 0;
+      padding: 0;
+    }
+
+    .lever-ball {
+      position: absolute;
+      top: -56px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 56px;
+      height: 56px;
+      background: radial-gradient(circle at 60% 30%, #fffde4 0%, #ffd700 60%, #bfa100 100%);
+      border-radius: 50%;
+      box-shadow:
+        0 0 18px 6px #ffd700,
+        0 4px 12px #bfa100,
+        0 0 0 4px #fff700 inset;
+      border: 3px solid #fffbe7;
+      z-index: 3;
+      transition: box-shadow 0.2s, transform 0.2s;
+      animation: leverBallGlow 2s infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes leverBallGlow {
+      0% { box-shadow: 0 0 18px  Asc6px #bfa100, 0 0 0 4px #fff700 inset; }
+      100% { box-shadow: 0 0 32px 12px #fffbe7, 0 8px 24px #ffd700, 0 0 0 8px #fff70044 inset; }
+    }
+
+    .jackpot-lights {
+      position: absolute;
+      top: -20px;
+      left: -20px;
+     
+
+ right: -20px;
+      bottom: -20px;
+      border-radius: 35px;
+      background: linear-gradient(45deg, 
+        #ff0000, #ff8000, #ffff00, #80ff00, 
+        #00ff00, #00ff80, #00ffff, #0080ff, 
+        #0000ff, #8000ff, #ff00ff, #ff0080);
+      background-size: 400% 400%;
+      animation: rainbowRotate 1s linear infinite;
+      z-index: -2;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .jackpot .jackpot-lights {
+      opacity: 0.9;
+    }
+
+    @keyframes rainbowRotate {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+
+    .static-text {
+      color: #ecf0f1;
+      font-size: 2em;
+      font-weight: 700;
+      margin: 0 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 800px) {
+      .lever {
+        font-size: 0.9em;
+        width: 48px;
+        height: 140px;
+      }
+      .lever-rod {
+        width: 100px;
+        right: -30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="casino-title">🎰 洞洞板旋轉 🎰</h1>
+  
+  <div class="slot-machine-container">
+    <div class="slot-machine">
+      <div class="jackpot-lights"></div>
+      
+      <div class="slots-display">
+        <span class="static-text">用</span>
+        
+        <div class="slot-reel" id="colorReel">
+          <div class="slot-window"></div>
+          <div class="reel-strip" id="colorStrip"></div>
+        </div>
+        
+        <span class="static-text">做一個</span>
+        
+        <div class="slot-reel" id="shapeReel">
+          <div class="slot-window"></div>
+          <div class="reel-strip" id="shapeStrip"></div>
+        </div>
+      </div>
+      
+      <div class="lever" id="lever" tabindex="0">
+        <div class="lever-ball"></div>
+        <span id="leverText">🎲<br>旋轉</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let audioContext;
+    let isRolling = false;
+    let comboCount = 0;
+    let musicPlaying = false;
+    let musicInterval = null;
+
+    const colors = ['紫色', '紅色', '藍色'];
+    const shapes = ['長方形', '正方形', '三角形', '直線'];
+
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playSpinSound() {
+      if (!audioContext) return;
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(100 + i * 50, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.05);
+        }, i * 50);
+      }
+    }
+
+    function playWinSound() {
+      if (!audioContext) return;
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.frequency.setValueAtTime(400 + i * 200, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(800 + i * 200, audioContext.currentTime + 0.3);
+          gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+        }, i * 100);
+      }
+    }
+
+    function startBackgroundMusic() {
+      if (musicInterval) return;
+      const notes = [
+        261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88,
+        523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77,
+        1046.50, 1174.66, 1318.51, 1396.91, 1567.98, 1760.00, 1975.53,
+        2093.00, 1975.53, 1760.00, 1567.98, 1396.91, 1318.51, 1174.66, 1046.50,
+        987.77, 880.00, 783.99, 698.46, 659.25, 587.33, 523.25,
+        392.00, 349.23, 329.63, 293.66, 261.63
+      ];
+      let melody = [
+        0, 2, 4, 7, 4, 2, 0, 12, 14, 16, 19, 16, 14, 12, 0, 7, 12, 19, 12, 7, 0,
+        21, 23, 24, 26, 28, 30, 32, 34, 36, 38, 36, 34, 32, 30, 28, 26, 24, 23, 21
+      ];
+      let melodyIndex = 0;
+      musicInterval = setInterval(() => {
+        if (!audioContext) return;
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.type = 'triangle';
+        let noteIdx = melody[melodyIndex % melody.length];
+        oscillator.frequency.value = notes[noteIdx % notes.length];
+        gainNode.gain.setValueAtTime(0.07, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        melodyIndex++;
+      }, 180);
+    }
+
+    function stopBackgroundMusic() {
+      if (musicInterval) {
+        clearInterval(musicInterval);
+        musicInterval = null;
+      }
+    }
+
+    function spinReel(stripId, duration, finalIndex) {
+      const strip = document.getElementById(stripId);
+      const reel = strip.parentElement;
+      reel.classList.add('slot-rolling');
+      let spins = 0;
+      const maxSpins = duration / 50;
+      const spinInterval = setInterval(() => {
+        spins++;
+        if (spins >= maxSpins) {
+          clearInterval(spinInterval);
+          reel.classList.remove('slot-rolling');
+          strip.style.transform = `translateY(-${finalIndex * 180}px)`;
+          setTimeout(checkCombination, 100);
+        }
+      }, 50);
+    }
+
+    function checkCombination() {
+      const colorStrip = document.getElementById('colorStrip');
+      const shapeStrip = document.getElementById('shapeStrip');
+      function getIndexFromTransform(transform, arrLength) {
+        if (!transform) return 0;
+        const match = transform.match(/-?(\d+(\.\d+)?)/);
+        if (!match) return 0;
+        return Math.round(Number(match[1]) / 180) % arrLength;
+      }
+      const colorIndex = getIndexFromTransform(colorStrip.style.transform, colors.length);
+      const shapeIndex = getIndexFromTransform(shapeStrip.style.transform, shapes.length);
+
+      if (
+        Math.abs(colorIndex - shapeIndex) === 1 ||
+        Math.abs(colorIndex - shapeIndex) === colors.length - 1
+      ) {
+        playWinSound();
+      }
+    }
+
+    function rollSlots() {
+      if (isRolling) return;
+      initAudio();
+      isRolling = true;
+      const lever = document.getElementById('lever');
+      const leverText = document.getElementById('leverText');
+      lever.disabled = true;
+      leverText.innerHTML = '🎰<br>旋轉中';
+      playSpinSound();
+      startBackgroundMusic();
+      const colorDuration = 1000 + Math.random() * 2000;
+      const shapeDuration = 1500 + Math.random() * 2000;
+      const colorFinal = Math.floor(Math.random() * colors.length);
+      const shapeFinal = Math.floor(Math.random() * shapes.length);
+      spinReel('colorStrip', colorDuration, colorFinal);
+      spinReel('shapeStrip', shapeDuration, shapeFinal);
+      setTimeout(() => {
+        isRolling = false;
+        lever.disabled = false;
+        leverText.innerHTML = '🎲<br>旋轉';
+        stopBackgroundMusic();
+      }, Math.max(colorDuration, shapeDuration) + 500);
+    }
+
+    function initReels() {
+      const colorStrip = document.getElementById('colorStrip');
+      const shapeStrip = document.getElementById('shapeStrip');
+      colorStrip.innerHTML = '';
+      shapeStrip.innerHTML = '';
+      const colorMap = {
+        '紫色': '#800080',
+        '紅色': '#ff0000',
+        '藍色': '#0000ff'
+      };
+      for (let i = 0; i < 12; i++) {
+        const colorText = colors[i % colors.length];
+        const colorSymbol = document.createElement('div');
+        colorSymbol.className = 'reel-symbol';
+        colorSymbol.textContent = colorText;
+        colorSymbol.style.color = colorMap[colorText];
+        colorStrip.appendChild(colorSymbol);
+        
+        const shapeText = shapes[i % shapes.length];
+        const shapeSymbol = document.createElement('div');
+        shapeSymbol.className = 'reel-symbol';
+        shapeSymbol.textContent = shapeText;
+        shapeStrip.appendChild(shapeSymbol);
+      }
+    }
+
+    document.getElementById('lever').addEventListener('click', rollSlots);
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        rollSlots();
+      }
+    });
+
+    document.addEventListener('click', () => {
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+        startBackgroundMusic();
+      }
+    });
+
+    window.addEventListener('load', () => {
+      initReels();
+      initAudio();
+    });
+  </script>
+</body>
+</html>
