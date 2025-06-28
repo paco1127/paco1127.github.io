@@ -544,13 +544,6 @@
       }
     });
 
-    document.addEventListener('click', () => {
-      if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume();
-        startBackgroundMusic();
-      }
-    });
-
     window.addEventListener('load', () => {
       initReels();
       initAudio();
