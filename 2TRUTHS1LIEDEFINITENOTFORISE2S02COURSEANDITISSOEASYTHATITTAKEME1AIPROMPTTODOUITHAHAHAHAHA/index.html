@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2 Truths 1 Lie</title>
+    <title>兩個真相一個謊言</title>
     <style>
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -106,36 +106,36 @@
 </head>
 <body>
     <div class="container">
-        <h1>2 Truths 1 Lie</h1>
+        <h1>兩個真相一個謊言</h1>
 
         <div id="input-section">
-            <h2>Enter Your Statements</h2>
+            <h2>請輸入你的敘述</h2>
             <div>
-                <label for="truth1">Truth 1:</label>
+                <label for="truth1">真相 1：</label>
                 <input type="text" id="truth1" name="truth1" required>
             </div>
             <div>
-                <label for="truth2">Truth 2:</label>
+                <label for="truth2">真相 2：</label>
                 <input type="text" id="truth2" name="truth2" required>
             </div>
             <div>
-                <label for="lie">The Lie:</label>
+                <label for="lie">謊言：</label>
                 <input type="text" id="lie" name="lie" required>
             </div>
-            <button id="submit-statements">Submit Statements</button>
+            <button id="submit-statements">送出敘述</button>
         </div>
 
         <div id="game-section" class="hidden">
             <div class="statements-display">
-                <h2>Guess the Lie!</h2>
-                <p style="text-align:center; color: #606770;">Click on the statement you think is the lie.</p>
+                <h2>猜猜哪個是謊言！</h2>
+                <p style="text-align:center; color: #606770;">點擊你認為是謊言的敘述。</p>
                 <div id="statements-list">
                     <!-- Statements will be populated here by JS -->
                 </div>
             </div>
 
             <div class="guessing-area">
-                <button id="reveal-lie-button" class="hidden">Reveal the Lie</button>
+                <button id="reveal-lie-button" class="hidden">揭曉謊言</button>
                 <p id="result"></p>
             </div>
         </div>
@@ -153,8 +153,8 @@
         const revealLieButton = document.getElementById('reveal-lie-button');
         const resultP = document.getElementById('result');
 
-        let statementsData = []; // Renamed from 'statements' to avoid conflict
-        let actualLieValue = ''; // Renamed from 'lieValue'
+        let statementsData = [];
+        let actualLieValue = '';
         let actualLieIndex = -1;
 
         submitStatementsButton.addEventListener('click', () => {
@@ -163,7 +163,7 @@
             const l = lieInput.value.trim();
 
             if (!t1 || !t2 || !l) {
-                alert('Please fill in all three statements.');
+                alert('請填寫三個敘述。');
                 return;
             }
 
@@ -197,7 +197,7 @@
             statementsData.forEach((stmt, index) => {
                 const stmtDiv = document.createElement('div');
                 stmtDiv.classList.add('statement-item');
-                stmtDiv.textContent = stmt.text; // Display only text, no numbering initially
+                stmtDiv.textContent = stmt.text;
                 stmtDiv.dataset.index = index;
                 stmtDiv.addEventListener('click', handleGuessSelection);
                 statementsListDiv.appendChild(stmtDiv);
@@ -205,18 +205,16 @@
         }
 
         function handleGuessSelection(event) {
-            // Clear previous selection
             document.querySelectorAll('.statement-item').forEach(item => item.classList.remove('selected-guess'));
-            // Highlight current selection
             event.target.classList.add('selected-guess');
-            resultP.textContent = `You've selected a statement. Click "Reveal the Lie" to see the answer.`;
+            resultP.textContent = `你已選擇一個敘述。請點擊「揭曉謊言」來看答案。`;
             resultP.style.backgroundColor = '#e7f3ff';
             resultP.style.color = '#1877f2';
         }
 
         revealLieButton.addEventListener('click', () => {
             if (actualLieIndex === -1) {
-                resultP.textContent = 'Game not started or no statements submitted.';
+                resultP.textContent = '遊戲尚未開始或尚未輸入敘述。';
                 resultP.style.backgroundColor = '#ffebe8';
                 resultP.style.color = '#c92a2a';
                 return;
@@ -231,12 +229,12 @@
             });
 
             statementItems.forEach((item, index) => {
-                item.textContent = `${index + 1}. ${statementsData[index].text}`; // Add numbering now
+                item.textContent = `${index + 1}. ${statementsData[index].text}`;
                 if (index === actualLieIndex) {
                     item.style.backgroundColor = '#fdecea'; 
                     item.style.color = '#c92a2a';
                     item.style.borderColor = '#c92a2a';
-                    item.textContent += ' (The Lie)';
+                    item.textContent += '（謊言）';
                 } else {
                     item.style.backgroundColor = '#e6f7ff'; 
                     item.style.color = '#1890ff';
@@ -244,20 +242,20 @@
                 }
                 item.removeEventListener('click', handleGuessSelection);
                 item.style.cursor = 'default';
-                item.classList.remove('selected-guess'); // Clear selection highlight
+                item.classList.remove('selected-guess');
             });
 
-            if (guessedIndex === -1) { // No guess was made
-                 resultP.textContent = `The lie was: "${actualLieValue}" (Statement ${actualLieIndex + 1}).`;
+            if (guessedIndex === -1) {
+                 resultP.textContent = `謊言是：「${actualLieValue}」（第 ${actualLieIndex + 1} 項）。`;
                  resultP.style.backgroundColor = '#fff3cd';
                  resultP.style.color = '#856404';
             } else {
                 if (guessedIndex === actualLieIndex) {
-                    resultP.textContent = `Correct! Statement ${actualLieIndex + 1} ("${actualLieValue}") was the lie.`;
+                    resultP.textContent = `答對了！第 ${actualLieIndex + 1} 項（「${actualLieValue}」）是謊言。`;
                     resultP.style.backgroundColor = '#d4edda';
                     resultP.style.color = '#155724';
                 } else {
-                    resultP.textContent = `Incorrect. Statement ${actualLieIndex + 1} ("${actualLieValue}") was the lie. You picked statement ${guessedIndex + 1}.`;
+                    resultP.textContent = `答錯了。第 ${actualLieIndex + 1} 項（「${actualLieValue}」）是謊言。你選的是第 ${guessedIndex + 1} 項。`;
                     resultP.style.backgroundColor = '#f8d7da';
                     resultP.style.color = '#721c24';
                 }
@@ -265,7 +263,7 @@
             revealLieButton.classList.add('hidden');
             
             const playAgainButton = document.createElement('button');
-            playAgainButton.textContent = 'Play Again';
+            playAgainButton.textContent = '再玩一次';
             playAgainButton.id = 'play-again-btn';
             playAgainButton.addEventListener('click', resetGame);
             resultP.parentNode.appendChild(playAgainButton);
@@ -274,7 +272,7 @@
         function resetGame() {
             inputSection.classList.remove('hidden');
             gameSection.classList.add('hidden');
-            revealLieButton.classList.add('hidden'); // Ensure reveal button is hidden on reset
+            revealLieButton.classList.add('hidden');
             
             truth1Input.value = '';
             truth2Input.value = '';
