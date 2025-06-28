@@ -259,7 +259,7 @@
     }
 
     @keyframes leverBallGlow {
-      0% { box-shadow: 0 0 18px  Asc6px #bfa100, 0 0 0 4px #fff700 inset; }
+      0% { box-shadow: 0 0 18px 6px #bfa100, 0 0 0 4px #fff700 inset; }
       100% { box-shadow: 0 0 32px 12px #fffbe7, 0 8px 24px #ffd700, 0 0 0 8px #fff70044 inset; }
     }
 
@@ -267,9 +267,7 @@
       position: absolute;
       top: -20px;
       left: -20px;
-     
-
- right: -20px;
+      right: -20px;
       bottom: -20px;
       border-radius: 35px;
       background: linear-gradient(45deg, 
@@ -334,6 +332,13 @@
           <div class="slot-window"></div>
           <div class="reel-strip" id="shapeStrip"></div>
         </div>
+        
+        <span class="static-text">長</span>
+        
+        <div class="slot-reel" id="sizeReel">
+          <div class="slot-window"></div>
+          <div class="reel-strip" id="sizeStrip"></div>
+        </div>
       </div>
       
       <div class="lever" id="lever" tabindex="0">
@@ -352,6 +357,7 @@
 
     const colors = ['紫色', '紅色', '藍色'];
     const shapes = ['長方形', '正方形', '三角形', '直線'];
+    const sizes = ['2', '3', '4', '任意'];
 
     function initAudio() {
       if (!audioContext) {
@@ -453,6 +459,7 @@
     function checkCombination() {
       const colorStrip = document.getElementById('colorStrip');
       const shapeStrip = document.getElementById('shapeStrip');
+      const sizeStrip = document.getElementById('sizeStrip');
       function getIndexFromTransform(transform, arrLength) {
         if (!transform) return 0;
         const match = transform.match(/-?(\d+(\.\d+)?)/);
@@ -461,11 +468,9 @@
       }
       const colorIndex = getIndexFromTransform(colorStrip.style.transform, colors.length);
       const shapeIndex = getIndexFromTransform(shapeStrip.style.transform, shapes.length);
+      const sizeIndex = getIndexFromTransform(sizeStrip.style.transform, sizes.length);
 
-      if (
-        Math.abs(colorIndex - shapeIndex) === 1 ||
-        Math.abs(colorIndex - shapeIndex) === colors.length - 1
-      ) {
+      if (colorIndex === sizeIndex % colors.length && shapeIndex === sizeIndex % shapes.length) {
         playWinSound();
       }
     }
@@ -482,23 +487,28 @@
       startBackgroundMusic();
       const colorDuration = 1000 + Math.random() * 2000;
       const shapeDuration = 1500 + Math.random() * 2000;
+      const sizeDuration = 2000 + Math.random() * 2000;
       const colorFinal = Math.floor(Math.random() * colors.length);
       const shapeFinal = Math.floor(Math.random() * shapes.length);
+      const sizeFinal = Math.floor(Math.random() * sizes.length);
       spinReel('colorStrip', colorDuration, colorFinal);
       spinReel('shapeStrip', shapeDuration, shapeFinal);
+      spinReel('sizeStrip', sizeDuration, sizeFinal);
       setTimeout(() => {
         isRolling = false;
         lever.disabled = false;
         leverText.innerHTML = '🎲<br>旋轉';
         stopBackgroundMusic();
-      }, Math.max(colorDuration, shapeDuration) + 500);
+      }, Math.max(colorDuration, shapeDuration, sizeDuration) + 500);
     }
 
     function initReels() {
       const colorStrip = document.getElementById('colorStrip');
       const shapeStrip = document.getElementById('shapeStrip');
+      const sizeStrip = document.getElementById('sizeStrip');
       colorStrip.innerHTML = '';
       shapeStrip.innerHTML = '';
+      sizeStrip.innerHTML = '';
       const colorMap = {
         '紫色': '#800080',
         '紅色': '#ff0000',
@@ -517,6 +527,12 @@
         shapeSymbol.className = 'reel-symbol';
         shapeSymbol.textContent = shapeText;
         shapeStrip.appendChild(shapeSymbol);
+        
+        const sizeText = sizes[i % sizes.length];
+        const sizeSymbol = document.createElement('div');
+        sizeSymbol.className = 'reel-symbol';
+        sizeSymbol.textContent = sizeText;
+        sizeStrip.appendChild(sizeSymbol);
       }
     }
 
