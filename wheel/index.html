@@ -7,26 +7,49 @@
   <style>
     body {
       display: flex;
-      flex-direction: column;
+      flex-direction: column;       /* keep the button below */
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
       background: linear-gradient(135deg, #74ebd5, #acb6e5);
       font-family: Arial, sans-serif;
-      color: #333;
+    }
+
+    /* container for wheels in a row */
+    .wheels-container {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 30px;
+    }
+
+    .wheel-wrapper {
+      position: relative;           /* for positioning the pin */
+      width: 150px;
+      height: 150px;
+    }
+
+    .pin {
+      position: absolute;
+      top: -15px;                   /* above the wheel */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 15px solid #e74c3c;
+      z-index: 10;
     }
 
     .wheel {
-      width: 150px;
-      height: 150px;
+      width: 100%;
+      height: 100%;
       border: 10px solid #3498db;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
-      margin: 20px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       overflow: hidden;
       background: radial-gradient(circle, #fff 30%, #e0e0e0 70%);
@@ -56,7 +79,6 @@
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       transition: background-color 0.3s, transform 0.3s;
-      margin-top: 20px;
     }
 
     button:hover {
@@ -81,73 +103,65 @@
 </head>
 <body>
 
-  <div class="wheel" id="wheel1">
-    <!-- 8 segments -->
-    <span style="transform: rotate(0deg);">1</span>
-    <span style="transform: rotate(45deg);">2</span>
-    <span style="transform: rotate(90deg);">3</span>
-    <span style="transform: rotate(135deg);">4</span>
-    <span style="transform: rotate(180deg);">5</span>
-    <span style="transform: rotate(225deg);">6</span>
-    <span style="transform: rotate(270deg);">7</span>
-    <span style="transform: rotate(315deg);">8</span>
-  </div>
+  <div class="wheels-container">
+    <div class="wheel-wrapper">
+      <div class="pin"></div>
+      <div class="wheel" id="wheel1">
+        <span style="transform: rotate(0deg);">1</span>
+        <span style="transform: rotate(45deg);">2</span>
+        <span style="transform: rotate(90deg);">3</span>
+        <span style="transform: rotate(135deg);">4</span>
+        <span style="transform: rotate(180deg);">5</span>
+        <span style="transform: rotate(225deg);">6</span>
+        <span style="transform: rotate(270deg);">7</span>
+        <span style="transform: rotate(315deg);">8</span>
+      </div>
+    </div>
 
-  <div class="wheel" id="wheel2">
-    <!-- 4 segments -->
-    <span style="transform: rotate(0deg);">A</span>
-    <span style="transform: rotate(90deg);">B</span>
-    <span style="transform: rotate(180deg);">C</span>
-    <span style="transform: rotate(270deg);">D</span>
-  </div>
+    <div class="wheel-wrapper">
+      <div class="pin"></div>
+      <div class="wheel" id="wheel2">
+        <span style="transform: rotate(0deg);">A</span>
+        <span style="transform: rotate(90deg);">B</span>
+        <span style="transform: rotate(180deg);">C</span>
+        <span style="transform: rotate(270deg);">D</span>
+      </div>
+    </div>
 
-  <div class="wheel" id="wheel3">
-    <!-- 4 segments -->
-    <span style="transform: rotate(0deg);">✔</span>
-    <span style="transform: rotate(90deg);">✖</span>
-    <span style="transform: rotate(180deg);">★</span>
-    <span style="transform: rotate(270deg);">☆</span>
+    <div class="wheel-wrapper">
+      <div class="pin"></div>
+      <div class="wheel" id="wheel3">
+        <span style="transform: rotate(0deg);">✔</span>
+        <span style="transform: rotate(90deg);">✖</span>
+        <span style="transform: rotate(180deg);">★</span>
+        <span style="transform: rotate(270deg);">☆</span>
+      </div>
+    </div>
   </div>
 
   <button id="spinButton" class="glow">Spin</button>
 
   <script>
-    /**
-     * Spins a wheel element.
-     * @param {HTMLElement} wheel
-     * @param {number} durationSec how many seconds the transition should take
-     * @param {number} delayMs delay before starting the spin
-     * @returns {Promise<{index: number, label: string}>}
-     */
     function spinWheel(wheel, durationSec, delayMs) {
       const segments = wheel.children.length;
-      const segmentAngle = 360 / segments;
-      const fullTurns = 2 + Math.floor(Math.random() * 4); // between 2 and 5 full turns
+      const anglePer = 360 / segments;
+      const turns = 2 + Math.floor(Math.random() * 4);
+      const target = Math.floor(Math.random() * segments);
+      const finalDeg = turns * 360 + target * anglePer;
 
-      // pick a random segment index
-      const targetIndex = Math.floor(Math.random() * segments);
-      const finalRotation = fullTurns * 360 + targetIndex * segmentAngle;
-
-      // clear previous highlight
-      Array.from(wheel.children).forEach(span => {
+      // clear old highlight
+      for (let span of wheel.children) {
         span.classList.remove('selected');
-      });
+      }
 
       return new Promise(resolve => {
         setTimeout(() => {
-          // apply CSS transition
           wheel.style.transition = `transform ${durationSec}s ease-in-out`;
-          wheel.style.transform = `rotate(${finalRotation}deg)`;
+          wheel.style.transform = `rotate(${finalDeg}deg)`;
 
-          // wait for it to finish
           setTimeout(() => {
-            // highlight the chosen segment
-            const chosenSpan = wheel.children[targetIndex];
-            chosenSpan.classList.add('selected');
-            resolve({
-              index: targetIndex,
-              label: chosenSpan.textContent
-            });
+            wheel.children[target].classList.add('selected');
+            resolve({ index: target, label: wheel.children[target].textContent });
           }, durationSec * 1000);
         }, delayMs);
       });
@@ -157,20 +171,13 @@
       const btn = document.getElementById('spinButton');
       btn.classList.add('glow');
 
-      // spin each wheel in sequence
-      const result1 = await spinWheel(document.getElementById('wheel1'), 2, 0);
-      const result2 = await spinWheel(document.getElementById('wheel2'), 2, 500);
-      const result3 = await spinWheel(document.getElementById('wheel3'), 2, 1000);
+      await spinWheel(document.getElementById('wheel1'), 2,   0);
+      await spinWheel(document.getElementById('wheel2'), 2, 500);
+      await spinWheel(document.getElementById('wheel3'), 2, 1000);
 
       btn.classList.remove('glow');
-
-      console.log(
-        'Results:',
-        result1.label,
-        result2.label,
-        result3.label
-      );
     });
   </script>
+
 </body>
 </html>
