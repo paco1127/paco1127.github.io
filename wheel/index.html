@@ -1,130 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fancy Spinning Wheels</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #74ebd5, #acb6e5);
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
-        .wheel {
-            width: 150px;
-            height: 150px;
-            border: 10px solid #3498db;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            margin: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            background: radial-gradient(circle, #ffffff 30%, #e0e0e0 70%);
-            transition: transform 0.5s ease-in-out;
-        }
-        .wheel span {
-            position: absolute;
-            font-size: 24px;
-            font-weight: bold;
-            color: #3498db;
-            transition: transform 0.5s ease-in-out;
-        }
-        button {
-            padding: 12px 24px;
-            font-size: 18px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-            transform: scale(1.05);
-        }
-        button:active {
-            transform: scale(0.95);
-        }
-        @keyframes glow {
-            0% { text-shadow: 0 0 5px #3498db, 0 0 10px #3498db, 0 0 15px #3498db; }
-            50% { text-shadow: 0 0 10px #2980b9, 0 0 20px #2980b9, 0 0 30px #2980b9; }
-            100% { text-shadow: 0 0 5px #3498db, 0 0 10px #3498db, 0 0 15px #3498db; }
-        }
-        .glow {
-            animation: glow 1.5s infinite alternate;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fancy Spinning Wheels</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+
+    .wheel {
+      width: 150px;
+      height: 150px;
+      border: 10px solid #3498db;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      margin: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      background: radial-gradient(circle, #fff 30%, #e0e0e0 70%);
+      transform: rotate(0deg);
+    }
+
+    .wheel span {
+      position: absolute;
+      font-size: 24px;
+      font-weight: bold;
+      color: #3498db;
+      transition: color 0.3s, text-shadow 0.3s;
+    }
+
+    .wheel span.selected {
+      color: #e74c3c;
+      text-shadow: 0 0 5px #e74c3c, 0 0 10px #e74c3c;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s, transform 0.3s;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    @keyframes glow {
+      0% { text-shadow: 0 0 5px #3498db, 0 0 10px #3498db; }
+      50% { text-shadow: 0 0 10px #2980b9, 0 0 20px #2980b9; }
+      100% { text-shadow: 0 0 5px #3498db, 0 0 10px #3498db; }
+    }
+
+    button.glow {
+      animation: glow 1.5s infinite alternate;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="wheel" id="wheel1">
-        <span style="transform: rotate(0deg);">1</span>
-        <span style="transform: rotate(45deg);">2</span>
-        <span style="transform: rotate(90deg);">3</span>
-        <span style="transform: rotate(135deg);">4</span>
-        <span style="transform: rotate(180deg);">5</span>
-        <span style="transform: rotate(225deg);">6</span>
-        <span style="transform: rotate(270deg);">7</span>
-        <span style="transform: rotate(315deg);">8</span>
-    </div>
-    <div class="wheel" id="wheel2">
-        <span style="transform: rotate(0deg);">1</span>
-        <span style="transform: rotate(90deg);">2</span>
-        <span style="transform: rotate(180deg);">3</span>
-        <span style="transform: rotate(270deg);">4</span>
-    </div>
-    <div class="wheel" id="wheel3">
-        <span style="transform: rotate(0deg);">1</span>
-        <span style="transform: rotate(90deg);">2</span>
-        <span style="transform: rotate(180deg);">3</span>
-        <span style="transform: rotate(270deg);">4</span>
-    </div>
-    <button id="spinButton" class="glow">Spin</button>
+  <div class="wheel" id="wheel1">
+    <!-- 8 segments -->
+    <span style="transform: rotate(0deg);">1</span>
+    <span style="transform: rotate(45deg);">2</span>
+    <span style="transform: rotate(90deg);">3</span>
+    <span style="transform: rotate(135deg);">4</span>
+    <span style="transform: rotate(180deg);">5</span>
+    <span style="transform: rotate(225deg);">6</span>
+    <span style="transform: rotate(270deg);">7</span>
+    <span style="transform: rotate(315deg);">8</span>
+  </div>
 
-    <script>
-        function spinWheel(wheel, duration, delay) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    wheel.style.transition = `transform ${duration}s ease-in-out`;
-                    const randomRotation = Math.floor(Math.random() * 360 + 720); // Spin at least 2 full rotations
-                    wheel.style.transform = `rotate(${randomRotation}deg)`;
-                    setTimeout(() => {
-                        wheel.style.transition = 'none'; // Disable transition for the final position
-                        const finalValue = Math.floor(Math.random() * (wheel.children.length));
-                        const angle = (finalValue * (360 / wheel.children.length)) + (360 * 2); // Calculate final angle
-                        wheel.style.transform = `rotate(${angle}deg)`;
-                        resolve();
-                    }, duration * 1000);
-                }, delay);
+  <div class="wheel" id="wheel2">
+    <!-- 4 segments -->
+    <span style="transform: rotate(0deg);">A</span>
+    <span style="transform: rotate(90deg);">B</span>
+    <span style="transform: rotate(180deg);">C</span>
+    <span style="transform: rotate(270deg);">D</span>
+  </div>
+
+  <div class="wheel" id="wheel3">
+    <!-- 4 segments -->
+    <span style="transform: rotate(0deg);">✔</span>
+    <span style="transform: rotate(90deg);">✖</span>
+    <span style="transform: rotate(180deg);">★</span>
+    <span style="transform: rotate(270deg);">☆</span>
+  </div>
+
+  <button id="spinButton" class="glow">Spin</button>
+
+  <script>
+    /**
+     * Spins a wheel element.
+     * @param {HTMLElement} wheel
+     * @param {number} durationSec how many seconds the transition should take
+     * @param {number} delayMs delay before starting the spin
+     * @returns {Promise<{index: number, label: string}>}
+     */
+    function spinWheel(wheel, durationSec, delayMs) {
+      const segments = wheel.children.length;
+      const segmentAngle = 360 / segments;
+      const fullTurns = 2 + Math.floor(Math.random() * 4); // between 2 and 5 full turns
+
+      // pick a random segment index
+      const targetIndex = Math.floor(Math.random() * segments);
+      const finalRotation = fullTurns * 360 + targetIndex * segmentAngle;
+
+      // clear previous highlight
+      Array.from(wheel.children).forEach(span => {
+        span.classList.remove('selected');
+      });
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          // apply CSS transition
+          wheel.style.transition = `transform ${durationSec}s ease-in-out`;
+          wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+          // wait for it to finish
+          setTimeout(() => {
+            // highlight the chosen segment
+            const chosenSpan = wheel.children[targetIndex];
+            chosenSpan.classList.add('selected');
+            resolve({
+              index: targetIndex,
+              label: chosenSpan.textContent
             });
-        }
+          }, durationSec * 1000);
+        }, delayMs);
+      });
+    }
 
-        document.getElementById('spinButton').addEventListener('click', async () => {
-            const wheel1 = document.getElementById('wheel1');
-            const wheel2 = document.getElementById('wheel2');
-            const wheel3 = document.getElementById('wheel3');
+    document.getElementById('spinButton').addEventListener('click', async () => {
+      const btn = document.getElementById('spinButton');
+      btn.classList.add('glow');
 
-            // Add glow effect to the button while spinning
-            const button = document.getElementById('spinButton');
-            button.classList.add('glow');
+      // spin each wheel in sequence
+      const result1 = await spinWheel(document.getElementById('wheel1'), 2, 0);
+      const result2 = await spinWheel(document.getElementById('wheel2'), 2, 500);
+      const result3 = await spinWheel(document.getElementById('wheel3'), 2, 1000);
 
-            await spinWheel(wheel1, 2, 0); // Spin first wheel
-            await spinWheel(wheel2, 2, 500); // Spin second wheel after 0.5s
-            await spinWheel(wheel3, 2, 1000); // Spin third wheel after 1s
+      btn.classList.remove('glow');
 
-            // Remove glow effect after spinning
-            button.classList.remove('glow');
-        });
-    </script>
+      console.log(
+        'Results:',
+        result1.label,
+        result2.label,
+        result3.label
+      );
+    });
+  </script>
 </body>
 </html>
