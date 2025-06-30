@@ -1,49 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CSV Reader</title>
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2"></script>
-  
-  <script>
-    var csvData;
-    var currentIndex = 0;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheat Code Example</title>
+    <script>
+        // Encrypted cheat codes
+        const codes = {
+            "aabb": "https://paco1127.github.io/2TRUTHS1LIEDEFINITENOTFORISE2S02COURSEANDITISSOEASYTHATITTAKEME1AIPROMPTTODOUITHAHAHAHAHA/index.html",
+            "abab": "https://paco1127.github.io/OMGITISMTRINA20x8GRIDWITHA25.5HEIGHTAND11.5WIDTHITISALSORANDOMIZEDOMGOFCOURSEITISNOTAICODEANDIDOKNOWWHATISMEANITISJUSTFORISE2S02COURSE/index.html",
+            "arrow up arrow up arrow down arrow down": "https://paco1127.github.io/OMGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEIIIIIIIIIIIIIIOOOOOOOOOOOOOOOOUUUUUUUUUUUUUU/index.html"
+        };
 
-    $(document).ready(function () {
-      $.ajax({
-        type: "GET",
-        url: "table_data.csv",
-        dataType: "text",
-        success: function (data) {
-          csvData = $.csv.toArrays(data);
-          displayData();
-        }
-      });
-    });
+        let inputSequence = '';
 
-    function displayData() {
-      var row = csvData[currentIndex];
-      var name = "1 " + row[1];
-      var count = parseFloat(row[2].replace(/,/g, ""));
-      var zeros = Array(count + 1).join("0");
-      var formattedCount = zeros.toLocaleString(); // Format count with commas
-      var output = name + " = 1" + formattedCount
+        document.addEventListener('keydown', (event) => {
+            // Check for arrow keys
+            if (event.key === 'ArrowUp') {
+                inputSequence += 'arrow up ';
+            } else if (event.key === 'ArrowDown') {
+                inputSequence += 'arrow down ';
+            } else {
+                inputSequence += event.key;
+            }
 
-      $("#output").text(output);
-    }
+            // Check if the input sequence matches any cheat code
+            if (codes[inputSequence.trim()]) {
+                window.location.href = codes[inputSequence.trim()];
+            }
 
-    function nextRow() {
-      if (currentIndex < csvData.length - 1) {
-        currentIndex++;
-        displayData();
-      }
-    }
-  </script>
+            // Reset the input sequence after a timeout
+            setTimeout(() => {
+                inputSequence = '';
+            }, 2000);
+        });
+    </script>
 </head>
 <body>
-  <h1>CSV Reader</h1>
-  <button onclick="nextRow()">Next</button>
-  <p id="output"></p>
+
 </body>
 </html>
