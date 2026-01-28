@@ -263,3 +263,200 @@ document.addEventListener('keydown', (e) => {
 });
 
 console.log('Portfolio website loaded successfully!');
+
+// Idle Points Counter System
+let s = 1;  // Significand
+let e = 0;  // Exponent
+let l = 0;  // Level (e-prefix count)
+
+const idlePointsElement = document.getElementById("idle-points");
+
+let lastTime = Date.now();
+
+function formatNumber(value, decimals = 0) {
+    return value.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    });
+}
+
+function updateIdlePoints() {
+    const now = Date.now();
+    let deltaTime = now - lastTime;
+    lastTime = now;
+    deltaTime /= 1000; // Convert to seconds
+    
+    // Calculate growth rate
+    const growth = ((e / 10 + 0.1) / (5 ** l)) * deltaTime;
+    e += Math.floor(growth);
+    s *= 10 ** (growth % 1);
+    
+    // Handle significand overflow
+    const significandDigits = Math.floor(Math.log10(s));
+    if (significandDigits >= 1) {
+        s /= 10 ** significandDigits;
+        e += significandDigits;
+    }
+    
+    // Level up when e reaches 1 million
+    if (e >= 1e6) {
+        s = e;
+        e = 0;
+        l++;
+    }
+    
+    // Format and display
+    const ePrefix = "".padEnd(l, "e");
+    let displayValue;
+    
+    if (e >= 6) {
+        const decimals = Math.max(4 - Math.floor(Math.log10(e || 1)), 0);
+        displayValue = ePrefix + formatNumber(s, decimals) + "e" + formatNumber(e, 0);
+    } else {
+        displayValue = ePrefix + formatNumber(s * (10 ** e), 0);
+    }
+    
+    idlePointsElement.innerText = displayValue;
+}
+
+// Update every 3 seconds
+setInterval(updateIdlePoints, 3000);
+
+// Initial update
+updateIdlePoints();
+
+// Hacker rain effect
+const hackerCanvas = document.getElementById('hacker-rain');
+const hackerCtx = hackerCanvas ? hackerCanvas.getContext('2d') : null;
+let hackerRainActive = false;
+let hackerRainFrame = null;
+let hackerColumns = [];
+
+function resizeHackerRain() {
+    if (!hackerCanvas) return;
+    hackerCanvas.width = window.innerWidth;
+    hackerCanvas.height = window.innerHeight;
+    const columnCount = Math.floor(hackerCanvas.width / 16);
+    hackerColumns = new Array(columnCount).fill(0).map(() => Math.random() * hackerCanvas.height);
+}
+
+function drawHackerRain() {
+    if (!hackerCtx || !hackerCanvas) return;
+    hackerCtx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+    hackerCtx.fillRect(0, 0, hackerCanvas.width, hackerCanvas.height);
+
+    hackerCtx.fillStyle = '#00ff7a';
+    hackerCtx.font = '14px monospace';
+
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=<>[]{}()';
+    hackerColumns.forEach((y, index) => {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const x = index * 16;
+        hackerCtx.fillText(char, x, y);
+        if (y > hackerCanvas.height + Math.random() * 100) {
+            hackerColumns[index] = 0;
+        } else {
+            hackerColumns[index] = y + 14 + Math.random() * 10;
+        }
+    });
+
+    if (hackerRainActive) {
+        hackerRainFrame = requestAnimationFrame(drawHackerRain);
+    }
+}
+
+function startHackerRain() {
+    if (!hackerCanvas || hackerRainActive) return;
+    hackerRainActive = true;
+    hackerCanvas.classList.remove('hidden');
+    resizeHackerRain();
+    drawHackerRain();
+}
+
+function stopHackerRain() {
+    if (!hackerCanvas) return;
+    hackerRainActive = false;
+    hackerCanvas.classList.add('hidden');
+    if (hackerRainFrame) {
+        cancelAnimationFrame(hackerRainFrame);
+        hackerRainFrame = null;
+    }
+    if (hackerCtx) {
+        hackerCtx.clearRect(0, 0, hackerCanvas.width, hackerCanvas.height);
+    }
+}
+
+window.addEventListener('resize', resizeHackerRain);
+
+// Theme Switcher
+function setTheme(theme) {
+    const root = document.documentElement;
+    if (theme === 'light') {
+        root.style.setProperty('--bg-primary', '#ffffff');
+        root.style.setProperty('--bg-secondary', '#f9fafb');
+        root.style.setProperty('--bg-tertiary', '#f3f4f6');
+        root.style.setProperty('--text-primary', '#111827');
+        root.style.setProperty('--text-secondary', '#6b7280');
+        root.style.setProperty('--text-accent', '#3b82f6');
+        root.style.setProperty('--border-color', '#e5e7eb');
+        root.style.setProperty('--glass-bg', 'rgba(255, 255, 255, 0.7)');
+        root.style.setProperty('--glass-border', 'rgba(255, 255, 255, 0.3)');
+        root.style.setProperty('--shadow-color', 'rgba(31, 38, 135, 0.15)');
+        root.style.setProperty('--blob-1', 'rgba(59, 130, 246, 0.2)');
+        root.style.setProperty('--blob-2', 'rgba(168, 85, 247, 0.2)');
+        root.style.setProperty('--blob-3', 'rgba(236, 72, 153, 0.2)');
+        stopHackerRain();
+    } else if (theme === 'dark') {
+        root.style.setProperty('--bg-primary', '#0b1020');
+        root.style.setProperty('--bg-secondary', '#111827');
+        root.style.setProperty('--bg-tertiary', '#1f2937');
+        root.style.setProperty('--text-primary', '#f3f4f6');
+        root.style.setProperty('--text-secondary', '#cbd5f5');
+        root.style.setProperty('--text-accent', '#93c5fd');
+        root.style.setProperty('--border-color', '#273244');
+        root.style.setProperty('--glass-bg', 'rgba(15, 23, 42, 0.7)');
+        root.style.setProperty('--glass-border', 'rgba(99, 102, 241, 0.18)');
+        root.style.setProperty('--shadow-color', 'rgba(0, 0, 0, 0.45)');
+        root.style.setProperty('--blob-1', 'rgba(37, 99, 235, 0.18)');
+        root.style.setProperty('--blob-2', 'rgba(139, 92, 246, 0.18)');
+        root.style.setProperty('--blob-3', 'rgba(236, 72, 153, 0.18)');
+        stopHackerRain();
+    } else if (theme === 'hacker') {
+        root.style.setProperty('--bg-primary', '#050505');
+        root.style.setProperty('--bg-secondary', '#0b0b0b');
+        root.style.setProperty('--bg-tertiary', '#101010');
+        root.style.setProperty('--text-primary', '#00ff7a');
+        root.style.setProperty('--text-secondary', '#6bff95');
+        root.style.setProperty('--text-accent', '#a7ffcf');
+        root.style.setProperty('--border-color', '#00ff7a');
+        root.style.setProperty('--glass-bg', 'rgba(5, 5, 5, 0.8)');
+        root.style.setProperty('--glass-border', 'rgba(0, 255, 122, 0.35)');
+        root.style.setProperty('--shadow-color', 'rgba(0, 255, 122, 0.25)');
+        root.style.setProperty('--blob-1', 'rgba(0, 255, 122, 0.12)');
+        root.style.setProperty('--blob-2', 'rgba(0, 255, 122, 0.12)');
+        root.style.setProperty('--blob-3', 'rgba(0, 255, 122, 0.12)');
+        startHackerRain();
+    } else if (theme === 'random') {
+        const randomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+        root.style.setProperty('--bg-primary', randomColor());
+        root.style.setProperty('--bg-secondary', randomColor());
+        root.style.setProperty('--bg-tertiary', randomColor());
+        root.style.setProperty('--text-primary', randomColor());
+        root.style.setProperty('--text-secondary', randomColor());
+        root.style.setProperty('--text-accent', randomColor());
+        root.style.setProperty('--border-color', randomColor());
+        root.style.setProperty('--glass-bg', `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.7)`);
+        root.style.setProperty('--glass-border', `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.3)`);
+        root.style.setProperty('--shadow-color', `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.2)`);
+        root.style.setProperty('--blob-1', `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.2)`);
+        root.style.setProperty('--blob-2', `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.2)`);
+        root.style.setProperty('--blob-3', `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.2)`);
+        stopHackerRain();
+    }
+}
+
+// Event listeners for theme buttons
+document.getElementById('light-theme').addEventListener('click', () => setTheme('light'));
+document.getElementById('dark-theme').addEventListener('click', () => setTheme('dark'));
+document.getElementById('hacker-theme').addEventListener('click', () => setTheme('hacker'));
+document.getElementById('random-theme').addEventListener('click', () => setTheme('random'));

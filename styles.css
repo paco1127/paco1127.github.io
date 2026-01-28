@@ -1,5 +1,22 @@
 /* Custom Styles */
 
+/* Theme Variables */
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-accent: #3b82f6;
+    --border-color: #e5e7eb;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --shadow-color: rgba(31, 38, 135, 0.15);
+    --blob-1: rgba(59, 130, 246, 0.2);
+    --blob-2: rgba(168, 85, 247, 0.2);
+    --blob-3: rgba(236, 72, 153, 0.2);
+}
+
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
@@ -8,32 +25,40 @@ html {
 /* Prevent horizontal scroll */
 body {
     overflow-x: hidden;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+#hacker-rain {
+    z-index: 1;
+    mix-blend-mode: screen;
 }
 
 /* Glassmorphism effects */
 .glass-card {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--glass-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 var(--shadow-color);
 }
 
 .glass-nav {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--glass-bg);
 }
 
 .glass-badge {
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--glass-bg);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--glass-border);
     padding: 0.5rem 1rem;
     border-radius: 9999px;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-primary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
@@ -41,6 +66,42 @@ body {
 .glass-badge:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Theme Classes */
+.theme-bg-primary { background-color: var(--bg-primary); }
+.theme-bg-secondary { background-color: var(--bg-secondary); }
+.theme-bg-tertiary { background-color: var(--bg-tertiary); }
+.theme-text-primary { color: var(--text-primary); }
+.theme-text-secondary { color: var(--text-secondary); }
+.theme-text-accent { color: var(--text-accent); }
+.theme-border { border-color: var(--border-color); }
+
+/* Theme overrides for Tailwind text utilities */
+.theme-text-primary .text-gray-900,
+.theme-text-primary .text-gray-800 {
+    color: var(--text-primary) !important;
+}
+
+.theme-text-primary .text-gray-700,
+.theme-text-primary .text-gray-600,
+.theme-text-primary .text-gray-500,
+.theme-text-primary .text-gray-400,
+.theme-text-primary .text-gray-300 {
+    color: var(--text-secondary) !important;
+}
+
+/* Themed blobs */
+.theme-blob {
+    background-color: var(--blob-1) !important;
+}
+
+.theme-blob-2 {
+    background-color: var(--blob-2) !important;
+}
+
+.theme-blob-3 {
+    background-color: var(--blob-3) !important;
 }
 
 /* Background patterns */
@@ -226,8 +287,9 @@ body {
 /* Tech badge styling */
 .tech-badge {
     display: inline-block;
-    background-color: #e5e7eb;
-    color: #374151;
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     padding: 0.375rem 0.75rem;
     border-radius: 0.375rem;
     font-size: 0.75rem;
@@ -236,8 +298,8 @@ body {
 }
 
 .tech-badge:hover {
-    background-color: #3b82f6;
-    color: white;
+    background-color: var(--text-accent);
+    color: #ffffff;
     transform: translateY(-2px);
 }
 
@@ -284,6 +346,8 @@ body {
 .project-card {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
 }
 
 .project-card::before {
@@ -308,10 +372,28 @@ body {
     transform: translateY(-8px) scale(1.02);
 }
 
+.project-card h3 {
+    color: var(--text-primary);
+}
+
+.project-card h4,
+.project-card p,
+.project-card li {
+    color: var(--text-secondary);
+}
+
 /* Achievement card animations */
 .achievement-card {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+}
+
+.achievement-card h3 {
+    color: var(--text-primary);
+}
+
+.achievement-card p {
+    color: var(--text-secondary);
 }
 
 .achievement-card::after {
