@@ -13,11 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # Step A: Check out your repository's code into the cloud runner
+    # Step A: Check out your repository using your secret PAT so it has WRITE permissions
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GH_PAT }}
 
-    # Step B: Install Python on the cloud runner (FIXED LINE HERE)
+    # Step B: Install Python on the cloud runner
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
