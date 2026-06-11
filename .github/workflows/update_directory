@@ -1,0 +1,49 @@
+name: Generate Dynamic Portfolio Index
+
+on:
+  # 1. Run automatically every month at midnight UTC
+  schedule:
+    - cron: '0 0 1 * *'
+  
+  # 2. Allows you to manually click a button to force an update instantly
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step A: Check out your repository's code into the cloud runner
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # Step B: Install Python on the cloud runner
+    - name: Set up Python
+      uses: actions/python-team/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # Step C: Install the HTTP requests library
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    # Step D: Execute the script, feeding it your secret PAT
+    - name: Run Directory Generator Script
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: python generate_index.py
+
+    # Step E: Check if index.html changed. If it did, commit and push it back up.
+    - name: Commit and Push Updated Index
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add index.html
+        if git diff --staged --quiet; then
+          echo "No changes detected in your repository listings."
+        else
+          git commit -m "Automated update of portfolio index.html [skip ci]"
+          git push
+        fi
