@@ -1,11 +1,11 @@
 name: Generate Dynamic Portfolio Index
 
 on:
-  # 1. Run automatically every month at midnight UTC
+  # Run automatically every month at midnight UTC
   schedule:
     - cron: '0 0 1 * *'
   
-  # 2. Allows you to manually click a button to force an update instantly
+  # Allows you to manually click a button to force an update instantly
   workflow_dispatch:
 
 jobs:
@@ -17,9 +17,9 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    # Step B: Install Python on the cloud runner
+    # Step B: Install Python on the cloud runner (FIXED LINE HERE)
     - name: Set up Python
-      uses: actions/python-team/setup-python@v5
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
