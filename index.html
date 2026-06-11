@@ -3,469 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-site-verification" content="JKlLRUpF7wz9PENCcnTZGKPCuWeVamIrIkPShkC_ktI" />
-    <title>Paco Chung - Computer Science Student</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
+    <title>My GitHub Pages Directory</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #f6f8fa;
+            color: #24292e;
+        }
+        h1 {
+            border-bottom: 2px solid #e1e4e8;
+            padding-bottom: 10px;
+            color: #0366d6;
+        }
+        .loading {
+            font-style: italic;
+            color: #586069;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #ffffff;
+            margin: 15px 0;
+            padding: 20px;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        li:hover {
+            transform: translateY(-2px);
+            border-color: #0366d6;
+        }
+        a {
+            color: #0366d6;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        p {
+            color: #586069;
+            margin: 8px 0 0 0;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="title">My GitHub Pages Directory</h1>
+    <div id="loading" class="loading">Scanning GitHub for hosted pages...</div>
+    <ul id="repo-list"></ul>
+
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        secondary: '#1e40af',
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                        'slide-up': 'slideUp 0.8s ease-out',
-                        'fade-in-up': 'fadeInUp 0.8s ease-out',
-                    }
+        // 1. REPLACE THIS WITH YOUR ACTUAL GITHUB USERNAME
+        const username = 'YOUR_GITHUB_USERNAME'; 
+
+        async function fetchGitHubPages() {
+            const repoList = document.getElementById('repo-list');
+            const loadingDiv = document.getElementById('loading');
+            
+            try {
+                // Fetches up to 100 public repositories sorted by most recently updated
+                const response = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+                
+                if (!response.ok) {
+                    throw new Error('Could not fetch data from GitHub API.');
                 }
+                
+                const repos = await response.json();
+                
+                // Filter: must have pages enabled, and skip this root repository itself
+                const pagesRepos = repos.filter(repo => 
+                    repo.has_pages && 
+                    repo.name.toLowerCase() !== `${username}.github.io`.toLowerCase()
+                );
+
+                loadingDiv.style.display = 'none';
+
+                if (pagesRepos.length === 0) {
+                    repoList.innerHTML = '<li>No other active GitHub Pages sites found for this account.</li>';
+                    return;
+                }
+
+                // Render the list items dynamically
+                pagesRepos.forEach(repo => {
+                    const li = document.createElement('li');
+                    
+                    // Build the standard deployment URL structure for project pages
+                    const pagesUrl = `https://${username}.github.io/${repo.name}/`;
+                    
+                    li.innerHTML = `
+                        <a href="${pagesUrl}" target="_blank">🔗 ${repo.name}</a>
+                        <p>${repo.description || '<i>No description provided for this repository.</i>'}</p>
+                    `;
+                    repoList.appendChild(li);
+                });
+
+            } catch (error) {
+                loadingDiv.innerText = `Error: ${error.message}`;
+                loadingDiv.style.color = '#cb2431';
             }
         }
+
+        // Run validation check before execution
+        if (username === 'YOUR_GITHUB_USERNAME') {
+            document.getElementById('loading').innerText = 'Configuration needed: Please open index.html and update the "username" variable.';
+        } else {
+            document.getElementById('title').innerText = `${username}.github.io Portfolio`;
+            fetchGitHubPages();
+        }
     </script>
-</head>
-<body class="theme-bg-primary theme-text-primary overflow-x-hidden">
-    <!-- Particle Background -->
-    <canvas id="particles-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
-    <!-- Hacker Rain Overlay -->
-    <canvas id="hacker-rain" class="fixed inset-0 pointer-events-none z-0 hidden"></canvas>
-    
-    <!-- Navigation -->
-    <nav class="glass-nav fixed w-full top-0 z-50 backdrop-blur-md">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex-shrink-0">
-                    <h1 class="text-2xl font-bold theme-text-primary">Paco Chung</h1>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#home" class="nav-link theme-text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                        <a href="#about" class="nav-link theme-text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
-                        <a href="#projects" class="nav-link theme-text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Projects</a>
-                        <a href="#achievements" class="nav-link theme-text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Achievements</a>
-                        <a href="#contact" class="nav-link theme-text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
-                    </div>
-                </div>
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="theme-text-secondary hover:text-primary focus:outline-none">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-                <!-- Theme Switcher -->
-                <div class="hidden md:flex items-center space-x-2 ml-4">
-                    <button id="light-theme" class="p-2 rounded-full bg-yellow-400 text-black hover:bg-yellow-500 transition-colors" title="Light Theme">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-                    <button id="dark-theme" class="p-2 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors" title="Dark Theme">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                        </svg>
-                    </button>
-                    <button id="hacker-theme" class="p-2 rounded-full bg-green-600 text-black hover:bg-green-500 transition-colors" title="Hacker Theme">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-                    <button id="random-theme" class="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-500 transition-colors" title="Random Theme">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 theme-bg-primary theme-border shadow-lg">
-                <a href="#home" class="mobile-nav-link block theme-text-secondary hover:text-primary hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium">Home</a>
-                <a href="#about" class="mobile-nav-link block theme-text-secondary hover:text-primary hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium">About</a>
-                <a href="#projects" class="mobile-nav-link block theme-text-secondary hover:text-primary hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium">Projects</a>
-                <a href="#achievements" class="mobile-nav-link block theme-text-secondary hover:text-primary hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium">Achievements</a>
-                <a href="#contact" class="mobile-nav-link block theme-text-secondary hover:text-primary hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium">Contact</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="pt-16 min-h-screen flex items-center relative overflow-hidden theme-bg-secondary">
-        <div class="absolute inset-0 opacity-30">
-            <div class="floating-shapes"></div>
-        </div>
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="flex-1 text-center md:text-left">
-                    <div class="inline-block mb-4">
-                        <span class="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold shadow-lg animate-glow">Open to Opportunities</span>
-                    </div>
-                    <h2 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 animate-fade-in">
-                        <span class="gradient-text">Paco Chung</span>
-                    </h2>
-                    <p class="text-xl sm:text-2xl text-gray-700 mb-6 typing-effect">Computer Science Student</p>
-                    <p class="text-lg text-gray-600 mb-8 max-w-2xl leading-relaxed">
-                        Passionate about building <span class="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">digital tools</span> that solve everyday problems through innovative software solutions.
-                    </p>
-                    <div class="flex flex-wrap gap-3 justify-center md:justify-start mb-8">
-                        <span class="glass-badge">Computer Science</span>
-                        <span class="glass-badge">Full-Stack Development</span>
-                        <span class="glass-badge">Cybersecurity</span>
-                        <span class="glass-badge">Innovation</span>
-                    </div>
-                    <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                        <a href="#projects" class="bg-primary hover:bg-secondary text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg">
-                            View Projects
-                        </a>
-                        <a href="#contact" class="bg-white hover:bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg border border-gray-300">
-                            Contact
-                        </a>
-                    </div>
-                </div>
-                <div class="flex-1 flex justify-center">
-                    <div class="relative animate-float">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-                        <div class="relative">
-                            <div class="absolute -inset-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full blur-lg opacity-50 animate-spin-slow"></div>
-                            <img src="1745925745371.jpeg" alt="Paco Chung" class="relative rounded-full w-64 h-64 sm:w-80 sm:h-80 object-cover shadow-2xl border-4 border-white ring-4 ring-purple-500/30">
-                        </div>
-                        <div class="absolute -bottom-4 -right-4 glass-card px-4 py-2 rounded-lg shadow-lg">
-                            <span class="font-semibold text-gray-800">Available</span>
-                        </div>
-                        <div class="absolute -top-4 -left-4 glass-card px-4 py-2 rounded-lg shadow-lg">
-                            <div class="text-xs text-gray-500 mb-1">Idle Points</div>
-                            <span id="idle-points" class="font-mono text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-20 theme-bg-primary relative">
-        <div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mb-4">Overview</span>
-                <h2 class="text-3xl sm:text-4xl font-bold theme-text-primary mb-4">About Me</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
-            </div>
-            <div class="max-w-4xl mx-auto">
-                <p class="text-lg theme-text-secondary mb-8 leading-relaxed text-center">
-                    I am a Computer Science student passionate about building digital tools that solve everyday problems. 
-                    With a strong foundation in software engineering and hands-on experience in web development, cybersecurity, 
-                    and system architecture, I continuously seek opportunities to apply my skills in real-world scenarios.
-                </p>
-                
-                <!-- Technical Skills -->
-                <div class="mt-12">
-                    <h3 class="text-2xl font-bold theme-text-primary mb-6 text-center">Technical Skills</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="glass-card p-6 rounded-xl hover:scale-105 transition-all duration-300 group">
-                            <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
-                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                <polyline points="16 18 22 12 16 6"></polyline>
-                                                <polyline points="8 6 2 12 8 18"></polyline>
-                                            </svg>
-                                        </div>
-                                        <h4 class="font-semibold text-lg text-gray-900">Programming Languages</h4>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="skill-badge">C#</span>
-                                <span class="skill-badge">Java</span>
-                                <span class="skill-badge">Python</span>
-                                <span class="skill-badge">SQL</span>
-                            </div>
-                        </div>
-                        <div class="glass-card p-6 rounded-xl hover:scale-105 transition-all duration-300 group">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <circle cx="12" cy="12" r="9"></circle>
-                                        <path d="M2 12h20"></path>
-                                        <path d="M12 2a15 15 0 0 1 0 20"></path>
-                                    </svg>
-                                </div>
-                                <h4 class="font-semibold text-lg text-gray-900">Web Frameworks</h4>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="skill-badge">Laravel</span>
-                                <span class="skill-badge">Bootstrap</span>
-                                <span class="skill-badge">jQuery</span>
-                            </div>
-                        </div>
-                        <div class="glass-card p-6 rounded-xl hover:scale-105 transition-all duration-300 group">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M14.7 10.3a4 4 0 0 1 0 5.7l-7.4 7.4-3.3-3.3 7.4-7.4a4 4 0 0 1 5.7 0z"></path>
-                                        <path d="M20.4 3.6a6 6 0 0 1 0 8.5"></path>
-                                    </svg>
-                                </div>
-                                <h4 class="font-semibold text-lg text-gray-900">Tools & DevOps</h4>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="skill-badge">Docker</span>
-                                <span class="skill-badge">Git</span>
-                                <span class="skill-badge">MySQL</span>
-                            </div>
-                        </div>
-                        <div class="glass-card p-6 rounded-xl hover:scale-105 transition-all duration-300 group">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-white">
-                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <rect x="9" y="2" width="6" height="4" rx="1"></rect>
-                                        <path d="M21 6v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6"></path>
-                                        <path d="M16 10H8"></path>
-                                    </svg>
-                                </div>
-                                <h4 class="font-semibold text-lg text-gray-900">Methodologies</h4>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="skill-badge">Agile/Scrum</span>
-                                <span class="skill-badge">MVC Architecture</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="py-20 theme-bg-secondary relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-96 h-96 theme-blob rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div class="absolute top-0 right-0 w-96 h-96 theme-blob-2 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div class="absolute bottom-0 left-1/2 w-96 h-96 theme-blob-3 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-semibold mb-4">Portfolio</span>
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-600 mx-auto rounded-full"></div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                
-                <!-- Project 1 -->
-                <div class="project-card rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-32 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Full-Stack Web Application</h3>
-                        <p class="text-gray-600 mb-4">
-                            Developed a scalable web system leveraging Agile methodologies and modern frameworks.
-                        </p>
-                        <div class="mb-4">
-                            <h4 class="font-semibold text-sm text-gray-700 mb-2">Tech Stack:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="tech-badge">Laravel</span>
-                                <span class="tech-badge">MySQL</span>
-                                <span class="tech-badge">Docker</span>
-                                <span class="tech-badge">jQuery</span>
-                                <span class="tech-badge">Bootstrap</span>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <p class="mb-2"><strong>Key Features:</strong></p>
-                            <ul class="list-disc list-inside space-y-1">
-                                <li>MVC Architecture</li>
-                                <li>Containerized with Docker</li>
-                                <li>Responsive Design</li>
-                                <li>Scrum Implementation</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 2 -->
-                <div class="project-card rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                    <div class="bg-gradient-to-r from-red-500 to-pink-600 h-32 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Cybersecurity & System Architecture</h3>
-                        <p class="text-gray-600 mb-4">
-                            Active participation in cybersecurity challenges and system design projects.
-                        </p>
-                        <div class="mb-4">
-                            <h4 class="font-semibold text-sm text-gray-700 mb-2">Tech Stack:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="tech-badge">CTF Strategy</span>
-                                <span class="tech-badge">System Security</span>
-                                <span class="tech-badge">C#</span>
-                                <span class="tech-badge">SQL</span>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <p class="mb-2"><strong>Key Activities:</strong></p>
-                            <ul class="list-disc list-inside space-y-1">
-                                <li>CTF Competitions</li>
-                                <li>Vulnerability Analysis</li>
-                                <li>Backend Architecture</li>
-                                <li>Data Security</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 3 -->
-                <div class="project-card rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                    <div class="bg-gradient-to-r from-green-500 to-teal-600 h-32 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Consumer Council Experience</h3>
-                        <p class="text-gray-600 mb-4">
-                            Professional experience at a statutory body in Hong Kong, applying software engineering principles.
-                        </p>
-                        <div class="mb-4">
-                            <h4 class="font-semibold text-sm text-gray-700 mb-2">Role:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="tech-badge">Professional Setting</span>
-                                <span class="tech-badge">Hong Kong</span>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <p class="mb-2"><strong>Scope:</strong></p>
-                            <ul class="list-disc list-inside space-y-1">
-                                <li>Internal Systems Development</li>
-                                <li>Consumer-Facing Tools</li>
-                                <li>Software Engineering Principles</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Achievements Section -->
-    <section id="achievements" class="py-20 theme-bg-primary relative">
-        <div class="absolute inset-0 bg-dot-pattern opacity-5"></div>
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold mb-4">Recognition</span>
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Achievements & Honors</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-yellow-500 to-orange-600 mx-auto rounded-full"></div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                
-                <div class="achievement-card glass-card p-6 rounded-xl hover:scale-105 transition-all duration-300 border-t-4 border-yellow-500 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 group-hover:from-yellow-400/20 group-hover:to-orange-400/20 transition-all"></div>
-                    <div class="flex justify-center mb-4 relative z-10">
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-yellow-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                            <svg class="w-16 h-16 text-yellow-600 relative" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 text-center mb-2 relative z-10">Scholarship Awardee</h3>
-                    <p class="text-gray-700 text-center relative z-10">
-                        Recognized for academic excellence and potential in Computer Science and Software Engineering.
-                    </p>
-                </div>
-
-                <div class="achievement-card glass-card p-6 rounded-xl hover:scale-105 transition-all duration-300 border-t-4 border-blue-500 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-purple-400/10 group-hover:from-blue-400/20 group-hover:to-purple-400/20 transition-all"></div>
-                    <div class="flex justify-center mb-4 relative z-10">
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-blue-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                            <svg class="w-16 h-16 text-blue-600 relative" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 text-center mb-2 relative z-10">Innovation Competition</h3>
-                    <p class="text-gray-700 text-center relative z-10">
-                        Competed in computer innovation challenges, showcasing problem-solving skills in competitive environments.
-                    </p>
-                </div>
-
-                <div class="achievement-card glass-card p-6 rounded-xl hover:scale-105 transition-all duration-300 border-t-4 border-red-500 relative overflow-hidden group">
-                    <div class="absolute inset-0 bg-gradient-to-br from-red-400/10 to-pink-400/10 group-hover:from-red-400/20 group-hover:to-pink-400/20 transition-all"></div>
-                    <div class="flex justify-center mb-4 relative z-10">
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-red-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                            <svg class="w-16 h-16 text-red-600 relative" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 text-center mb-2 relative z-10">CTF Competitions</h3>
-                    <p class="text-gray-700 text-center relative z-10">
-                        Active CTF player, consistently developing skills in penetration testing and secure coding practices.
-                    </p>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 theme-bg-secondary relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold mb-4">Contact</span>
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Contact</h2>
-                <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-blue-600 mx-auto rounded-full"></div>
-            </div>
-            <div class="max-w-2xl mx-auto">
-                <div class="glass-card rounded-2xl shadow-2xl p-8 border border-white/20">
-                    <p class="text-lg text-gray-700 text-center mb-8">
-                        I welcome inquiries about internships, projects, and collaboration opportunities.
-                    </p>
-                    <div class="flex flex-col items-center space-y-6">
-                        <div class="flex items-center space-x-3">
-                            <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-                            </svg>
-                            <a href="mailto:miwede6561@sepole.com" class="text-lg text-gray-700 hover:text-primary transition-colors">
-                                miwede6561@sepole.com
-                            </a>
-                        </div>
-                        <div class="pt-6">
-                            <a href="mailto:miwede6561@sepole.com" class="bg-primary hover:bg-secondary text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg inline-block">
-                                Send Email
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="theme-bg-tertiary theme-text-primary py-12 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-0 left-1/4 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
-            <div class="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
-        </div>
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <div class="mb-4">
-                <h3 class="text-2xl font-bold mb-2">Paco Chung</h3>
-                <p class="theme-text-secondary">Computer Science and Software Engineering Portfolio</p>
-            </div>
-            <div class="border-t border-gray-700 pt-6 mt-6">
-                <p class="text-gray-400">
-                    &copy; 2026 Paco Chung. All rights reserved.
-                </p>
-                <p class="text-gray-500 mt-2 text-sm">
-                    Built with Tailwind CSS
-                </p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
 </body>
 </html>
